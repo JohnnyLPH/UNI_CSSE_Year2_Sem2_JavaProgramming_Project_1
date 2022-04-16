@@ -17,6 +17,8 @@ public class HealthDiary {
         
         // Based on iPhone SE display resolution (750 * 1334).
         appFrame.setPreferredSize(new Dimension(375, 667));
+        // Not allow resizing app frame.
+        appFrame.setResizable(false);
 
         // TODO: Add content to app frame, first create other classes.
 
