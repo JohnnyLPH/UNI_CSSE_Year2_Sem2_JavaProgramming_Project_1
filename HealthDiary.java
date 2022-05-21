@@ -31,8 +31,8 @@ public class HealthDiary {
         // Set background color.
         appFrame.getContentPane().setBackground(BG_COLOR);
 
-        // Add Home Page panel to app frame.
-        appFrame.getContentPane().add(new HomePagePanel(), BorderLayout.CENTER);
+        // Add content panel to app frame.
+        appFrame.getContentPane().add(new ContentPanel(), BorderLayout.CENTER);
 
         // Display app frame.
         appFrame.pack();

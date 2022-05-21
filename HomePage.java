@@ -4,29 +4,20 @@
 //     - LAU PIKK HEANG (75359)
 //     - YUKI CHUNG PEI YING (77237)
 //     - ANDREA ANG XIAO XUAN (73347)
-// Health Diary App: Home Page Panel.
+// Health Diary App: Home Page.
 import java.awt.*;
-import java.awt.event.*;
 import javax.swing.*;
 
 
-public class HomePagePanel extends JPanel {
+public class HomePage extends ContentPage {
+    // private ContentPanel contentPanel;
     private JLabel homeHeading;
     private JButton profileButton, recordButton, graphReportButton;
 
-    // Redirect to different pages based on buttons clicked.
-    private class RedirectListener implements ActionListener {
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            String buttonClicked = e.getActionCommand();
+    // Constructor.
+    public HomePage(ContentPanel contentPanel) {
+        super(contentPanel);
 
-            // For debugging, comment out if not used.
-            // System.out.println("Button Click: " + buttonClicked);
-            // homeHeading.setText("Button Click: " + buttonClicked);
-        }
-    }
-
-    public HomePagePanel() {
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
         setBackground(HealthDiary.BG_COLOR);
 
@@ -51,30 +42,30 @@ public class HomePagePanel extends JPanel {
         add(homeHeading);
         add(Box.createRigidArea(new Dimension(0, 20)));
 
-        // Button for User Profile.
+        // Button for redirecting to Profile Page.
         profileButton = new JButton("User Profile");
-        profileButton.setActionCommand("User Profile");
-        profileButton.addActionListener(new RedirectListener());
+        profileButton.setActionCommand(contentPanel.ALL_PAGES[1]);
+        profileButton.addActionListener(getNewRedirectListener());
 
-        // Add User Profile button.
+        // Add Profile Page button.
         add(profileButton);
         add(Box.createRigidArea(new Dimension(0, 10)));
 
-        // Button for Health Records.
+        // Button for redirecting to Record Page.
         recordButton = new JButton("All Health Records");
-        recordButton.setActionCommand("Health Records");
-        recordButton.addActionListener(new RedirectListener());
+        recordButton.setActionCommand(contentPanel.ALL_PAGES[2]);
+        recordButton.addActionListener(getNewRedirectListener());
         
-        // Add Health Records button.
+        // Add Record Page button.
         add(recordButton);
         add(Box.createRigidArea(new Dimension(0, 10)));
 
-        // Button for Graph Report.
+        // Button for redirecting to Graph Page.
         graphReportButton = new JButton("View Graph Report");
-        graphReportButton.setActionCommand("Graph Report");
-        graphReportButton.addActionListener(new RedirectListener());
+        graphReportButton.setActionCommand(contentPanel.ALL_PAGES[3]);
+        graphReportButton.addActionListener(getNewRedirectListener());
         
-        // Add Graph Report button.
+        // Add Graph Page button.
         add(graphReportButton);
         return;
     }
