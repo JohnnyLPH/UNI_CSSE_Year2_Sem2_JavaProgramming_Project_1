@@ -18,7 +18,7 @@ public class ContentPanel extends JPanel {
     // Constructor.
     public ContentPanel() {
         setLayout(new CardLayout());
-        setBackground(HealthDiary.BG_COLOR);
+        setBackground(AppFrame.BG_COLOR);
 
         // Add Home Page.
         homePage = new HomePage(this);

@@ -18,12 +18,13 @@ public class ProfilePage extends ContentPage {
         super(contentPanel);
 
         setLayout(new BorderLayout());
-        setBackground(HealthDiary.BG_COLOR);
+        setBackground(AppFrame.BG_COLOR);
 
         // Button for returning to previous page.
         returnButton = new JButton("<-");
         returnButton.setActionCommand(contentPanel.ALL_PAGES[0]);
-        returnButton.addActionListener(getNewRedirectListener());
+        returnButton.addActionListener(this);
+        returnButton.setFocusable(false);
 
         // Add return button.
         add(returnButton, BorderLayout.NORTH);
@@ -35,7 +36,7 @@ public class ProfilePage extends ContentPage {
         
         // Adjust heading text.
         profileHeading.setFont(new Font("Monospaced", Font.BOLD, 20));
-        profileHeading.setForeground(HealthDiary.TEXT_COLOR);
+        profileHeading.setForeground(AppFrame.TEXT_COLOR);
         profileHeading.setHorizontalTextPosition(JLabel.CENTER);
         profileHeading.setVerticalTextPosition(JLabel.BOTTOM);
         profileHeading.setHorizontalAlignment(JLabel.CENTER);
