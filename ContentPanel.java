@@ -13,6 +13,7 @@ import javax.swing.*;
 
 
 public class ContentPanel extends JPanel {
+    // Upper Content Panel containing current Content Panel.
     private ContentPanel lastContentPanel;
     private ArrayList<String> allPages;
 

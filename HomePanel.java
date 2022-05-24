@@ -14,10 +14,13 @@ public class HomePanel extends ContentPanel {
     private ContentPage homeMenu;
     private JLabel homeHeading;
     private JButton profileButton, recordButton, graphButton;
+    private ProfilePanel profilePanel;
 
     // Constructor.
     public HomePanel() {
         addHomeMenu();
+        addProfilePanel();
+
         return;
     }
 
@@ -82,6 +85,16 @@ public class HomePanel extends ContentPanel {
         // Add Graph Page button.
         this.homeMenu.add(graphButton);
 
+        // Add to Home Panel.
         this.addPage(this.homeMenu, "Home Menu");
+        return;
+    }
+
+    public void addProfilePanel() {
+        profilePanel = new ProfilePanel(this);
+
+        // Add to Home Panel.
+        this.addPage(this.profilePanel, "Profile Panel");
+        return;
     }
 }

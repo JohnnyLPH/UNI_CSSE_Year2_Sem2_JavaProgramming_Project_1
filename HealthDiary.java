@@ -7,7 +7,6 @@
 // Health Diary App: Main Function in this file.
 import java.awt.*;
 import javax.swing.*;
-import java.awt.event.*;
 
 
 public class HealthDiary {
