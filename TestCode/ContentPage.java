@@ -1,3 +1,4 @@
+package TestCode;
 // TMF2954 Java Programming Group Project
 // Group Name: LUCKY
 // Group Members:
@@ -31,13 +32,12 @@ public class ContentPage extends JPanel implements ActionListener {
     // Constructor.
     public ContentPage(ContentPanel contentPanel) {
         this.contentPanel = contentPanel;
-        setBackground(HealthDiary.BG_COLOR);
         return;
     }
 
     // Getter.
     public ContentPanel getContentPanel() {
-        return this.contentPanel;
+        return contentPanel;
     }
 
     // Method.
@@ -49,17 +49,11 @@ public class ContentPage extends JPanel implements ActionListener {
     // Redirect to different pages based on buttons clicked.
     @Override
     public void actionPerformed(ActionEvent e) {
-        // Switch to previous panel of the Content Panel containing this page.
-        if (e.getActionCommand().equals("Last Panel")) {
-            this.contentPanel.switchLastPanel();
-        }
-        // Change displayed page in Content Panel.
-        else {
-            this.contentPanel.switchPage(e.getActionCommand());
-        }
+        // Change displayed page in content panel (CardLayout).
+        ((CardLayout) contentPanel.getLayout()).show(contentPanel, e.getActionCommand());
 
         // For debugging, comment out if not used.
-        System.out.println("Button Click: " + e.getActionCommand());
+        // System.out.println("Button Click: " + e.getActionCommand());
         return;
     }
 }
