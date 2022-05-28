@@ -13,7 +13,7 @@ import javax.swing.*;
 public class ProfilePanel extends ContentPanel {
     private ContentPage viewProfile, editProfile;
     private JLabel viewProfileHeading;
-    private JButton returnButton, recordButton, graphButton;
+    private JButton returnPanelBtn;
 
     // Constructor.
     public ProfilePanel(ContentPanel lastContentPanel) {
@@ -25,21 +25,45 @@ public class ProfilePanel extends ContentPanel {
 
     // Method.
     public void addViewProfile() {
-        this.viewProfile = new ContentPage(this);
-        this.viewProfile.setLayout(new BorderLayout());
+        viewProfile = new ContentPage(this);
+        viewProfile.setLayout(new BorderLayout());
 
-        this.returnButton = new JButton("Back");
-        this.returnButton.setActionCommand("Last Panel");
-        this.returnButton.addActionListener(this.viewProfile);
+        // Button for redirecting to Last Panel.
+        returnPanelBtn = new JButton(HealthDiary.UNI_RETURN_ARROW + " Back");
+        // Adjust button font.
+        returnPanelBtn.setFont(HealthDiary.SMALL_BTN_FONT);
+        // Adjust button color.
+        returnPanelBtn.setForeground(HealthDiary.BTN_FG_COLOR);
+        returnPanelBtn.setBackground(HealthDiary.BTN_BG_COLOR);
+        // Adjust button action.
+        returnPanelBtn.setActionCommand("Last Panel");
+        returnPanelBtn.addActionListener(viewProfile);
+        returnPanelBtn.setFocusable(false);
 
-        this.viewProfile.add(this.returnButton, BorderLayout.NORTH);
+        viewProfile.add(returnPanelBtn, BorderLayout.NORTH);
 
-        this.viewProfileHeading = new JLabel("View Profile Page");
-        this.viewProfileHeading.setForeground(HealthDiary.TEXT_COLOR);
-        
-        this.viewProfile.add(this.viewProfileHeading, BorderLayout.CENTER);
+        // Heading for View Profile.
+        viewProfileHeading = new JLabel("User Profile");
+        // Adjust heading font.
+        viewProfileHeading.setFont(HealthDiary.MAIN_FONT);
+        // Adjust heading color.
+        viewProfileHeading.setForeground(HealthDiary.TEXT_COLOR);
 
-        this.addPage(this.viewProfile, "View Profile");
+        viewProfile.add(viewProfileHeading, BorderLayout.CENTER);
+
+        addPage(viewProfile, "View Profile", 0);
         return;
+    }
+
+    public boolean refreshViewProfile(boolean displayNow) {
+        if (removePage("View Profile")) {
+            addViewProfile();
+    
+            if (displayNow) {
+                switchPage("View Profile");
+            }
+            return true;
+        }
+        return false;
     }
 }

@@ -38,12 +38,48 @@ public class ContentPanel extends JPanel {
     // Method.
     // Add Content Page or Content Panel.
     public void addPage(JPanel page, String pageName) {
+        page.setName(pageName);
         super.add(page, pageName);
         this.allPages.add(pageName);
         return;
     }
 
-    // Switch page using page index.
+    // Add Content Page or Content Panel at specific index in allPages [0 <= x <= size].
+    public boolean addPage(JPanel page, String pageName, int pageIndex) {
+        // Invalid index.
+        if (pageIndex < 0 || pageIndex > this.allPages.size()) {
+            return false;
+        }
+
+        page.setName(pageName);
+        super.add(page, pageName);
+        this.allPages.add(pageIndex, pageName);
+        return true;
+    }
+
+    // Remove Content Page or Content Panel.
+    public boolean removePage(String pageName) {
+        if (!this.allPages.contains(pageName)) {
+            return false;
+        }
+
+        // Get objects of all pages in current Content Panel.
+        Component[] components = this.getComponents();
+
+        // Find the object of the page to remove.
+        for(int i = 0; i < components.length; i++) {
+            if (components[i].getName().equals(pageName)) {
+                components[i].setVisible(false);
+                ((CardLayout) this.getLayout()).removeLayoutComponent(components[i]);
+
+                this.allPages.remove(pageName);
+                return true;
+            }
+        }
+        return false;
+    }
+
+    // Switch page using page index in allPages [0 <= x < size)].
     public boolean switchPage(int pageIndex) {
         // Invalid index.
         if (pageIndex < 0 || pageIndex > this.allPages.size() - 1) {

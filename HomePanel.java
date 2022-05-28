@@ -5,7 +5,7 @@
 //     - YUKI CHUNG PEI YING (77237)
 //     - ANDREA ANG XIAO XUAN (73347)
 // Health Diary App: Home Panel.
-// Contain Main Menu, Profile Panel, Record Panel, Graph Panel.
+// Contain Home Menu, Profile Panel, Record Panel, Graph Panel.
 import java.awt.*;
 import javax.swing.*;
 
@@ -14,79 +14,108 @@ public class HomePanel extends ContentPanel {
     private ContentPage homeMenu;
     private JLabel homeHeading;
     private JButton profileButton, recordButton, graphButton;
-    private ProfilePanel profilePanel;
+    private ContentPanel profilePanel, recordPanel, graphPanel;
 
     // Constructor.
     public HomePanel() {
         addHomeMenu();
         addProfilePanel();
-
+        addRecordPanel();
+        addGraphPanel();
         return;
     }
 
     // Method.
     public void addHomeMenu() {
-        this.homeMenu = new ContentPage(this);
+        homeMenu = new ContentPage(this);
 
-        this.homeMenu.setLayout(new BoxLayout(this.homeMenu, BoxLayout.Y_AXIS));
+        homeMenu.setLayout(new BoxLayout(homeMenu, BoxLayout.Y_AXIS));
 
-        // Heading of Home Page.
-        homeHeading = new JLabel("Health Diary by LUCKY");
+        // Heading of Home Menu.
+        homeHeading = new JLabel(HealthDiary.UNI_CROSS + "Health Diary" + HealthDiary.UNI_CROSS + " by LUCKY");
         // Add border to heading.
-        homeHeading.setBorder(BorderFactory.createLineBorder(Color.CYAN, 3));
+        homeHeading.setBorder(BorderFactory.createLineBorder(Color.CYAN, 3, true));
         // Add icon to heading.
         homeHeading.setIcon(new ImageIcon(
             HealthDiary.APP_ICON.getImage().getScaledInstance(128, 128, java.awt.Image.SCALE_SMOOTH)
         ));
-        // Adjust heading text.
-        homeHeading.setFont(new Font("Monospaced", Font.BOLD, 20));
+        // Adjust heading font.
+        homeHeading.setFont(HealthDiary.MAIN_FONT);
+        // Adjust heading color.
         homeHeading.setForeground(HealthDiary.TEXT_COLOR);
+        homeHeading.setBackground(HealthDiary.LABEL_BG_COLOR);
+        homeHeading.setOpaque(true);
+        // Adjust heading text alignment.
         homeHeading.setHorizontalTextPosition(JLabel.CENTER);
         homeHeading.setVerticalTextPosition(JLabel.BOTTOM);
         homeHeading.setAlignmentX(Component.CENTER_ALIGNMENT);
 
-        this.homeMenu.add(Box.createRigidArea(new Dimension(0, 20)));
         // Add heading to Home Page.
-        this.homeMenu.add(homeHeading);
-        this.homeMenu.add(Box.createRigidArea(new Dimension(0, 25)));
+        homeMenu.add(Box.createRigidArea(new Dimension(0, 50)));
+        homeMenu.add(homeHeading);
+        homeMenu.add(Box.createRigidArea(new Dimension(0, 40)));
 
         // Button for redirecting to Profile Page.
         profileButton = new JButton("User Profile");
+        // Adjust button font.
+        profileButton.setFont(HealthDiary.BTN_FONT);
+        // Adjust button color.
+        profileButton.setForeground(HealthDiary.BTN_FG_COLOR);
+        profileButton.setBackground(HealthDiary.BTN_BG_COLOR);
+        // Adjust button border.
+        profileButton.setBorder(BorderFactory.createLineBorder(HealthDiary.BTN_FG_COLOR, 4, true));
+        // Adjust button action.
         profileButton.setActionCommand("Profile Panel");
-        profileButton.addActionListener(this.homeMenu);
+        profileButton.addActionListener(homeMenu);
         profileButton.setFocusable(false);
         profileButton.setMaximumSize(new Dimension(200, 50));
         profileButton.setAlignmentX(Component.CENTER_ALIGNMENT);
 
         // Add Profile Page button.
-        this.homeMenu.add(profileButton);
-        this.homeMenu.add(Box.createRigidArea(new Dimension(0, 15)));
+        homeMenu.add(profileButton);
+        homeMenu.add(Box.createRigidArea(new Dimension(0, 25)));
 
         // Button for redirecting to Record Page.
         recordButton = new JButton("All Health Records");
+        // Adjust button font.
+        recordButton.setFont(HealthDiary.BTN_FONT);
+        // Adjust button color.
+        recordButton.setForeground(HealthDiary.BTN_FG_COLOR);
+        recordButton.setBackground(HealthDiary.BTN_BG_COLOR);
+        // Adjust button border.
+        recordButton.setBorder(BorderFactory.createLineBorder(HealthDiary.BTN_FG_COLOR, 4, true));
+        // Adjust button action.
         recordButton.setActionCommand("Record Panel");
-        recordButton.addActionListener(this.homeMenu);
+        recordButton.addActionListener(homeMenu);
         recordButton.setFocusable(false);
         recordButton.setMaximumSize(new Dimension(200, 50));
         recordButton.setAlignmentX(Component.CENTER_ALIGNMENT);
         
         // Add Record Page button.
-        this.homeMenu.add(recordButton);
-        this.homeMenu.add(Box.createRigidArea(new Dimension(0, 15)));
+        homeMenu.add(recordButton);
+        homeMenu.add(Box.createRigidArea(new Dimension(0, 25)));
 
         // Button for redirecting to Graph Page.
         graphButton = new JButton("View Graph Report");
+        // Adjust button font.
+        graphButton.setFont(HealthDiary.BTN_FONT);
+        // Adjust button color.
+        graphButton.setForeground(HealthDiary.BTN_FG_COLOR);
+        graphButton.setBackground(HealthDiary.BTN_BG_COLOR);
+        // Adjust button border.
+        graphButton.setBorder(BorderFactory.createLineBorder(HealthDiary.BTN_FG_COLOR, 4, true));
+        // Adjust button action.
         graphButton.setActionCommand("Graph Panel");
-        graphButton.addActionListener(this.homeMenu);
+        graphButton.addActionListener(homeMenu);
         graphButton.setFocusable(false);
         graphButton.setMaximumSize(new Dimension(200, 50));
         graphButton.setAlignmentX(Component.CENTER_ALIGNMENT);
-        
+
         // Add Graph Page button.
-        this.homeMenu.add(graphButton);
+        homeMenu.add(graphButton);
 
         // Add to Home Panel.
-        this.addPage(this.homeMenu, "Home Menu");
+        addPage(homeMenu, "Home Menu", 0);
         return;
     }
 
@@ -94,7 +123,23 @@ public class HomePanel extends ContentPanel {
         profilePanel = new ProfilePanel(this);
 
         // Add to Home Panel.
-        this.addPage(this.profilePanel, "Profile Panel");
+        addPage(profilePanel, "Profile Panel", 1);
+        return;
+    }
+
+    public void addRecordPanel() {
+        recordPanel = new RecordPanel(this);
+
+        // Add to Home Panel.
+        addPage(recordPanel, "Record Panel", 2);
+        return;
+    }
+
+    public void addGraphPanel() {
+        graphPanel = new GraphPanel(this);
+
+        // Add to Home Panel.
+        addPage(graphPanel, "Graph Panel", 3);
         return;
     }
 }
