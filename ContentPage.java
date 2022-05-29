@@ -30,7 +30,7 @@ public class ContentPage extends JPanel implements ActionListener {
     // Constructor.
     public ContentPage(ContentPanel contentPanel) {
         this.contentPanel = contentPanel;
-        setBackground(HealthDiary.BG_COLOR);
+        setBackground(HealthDiary.BLACK_BG_COLOR);
         return;
     }
 

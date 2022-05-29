@@ -11,8 +11,9 @@ import javax.swing.*;
 
 
 public class RecordPanel extends ContentPanel {
+    // Content Page.
     private ContentPage viewAllRecord, viewEachRecord, addRecord, editRecord, deleteRecord;
-    private JLabel viewAllRecordHeading;
+    // Button.
     private JButton returnPanelBtn;
 
     // Constructor.
@@ -28,25 +29,25 @@ public class RecordPanel extends ContentPanel {
         viewAllRecord = new ContentPage(this);
         viewAllRecord.setLayout(new BorderLayout());
 
+        // ----------------------------------------------------------------------------------------------------
         // Button for redirecting to Last Panel.
         returnPanelBtn = new JButton(HealthDiary.UNI_RETURN_ARROW + " Back");
-        // Adjust button font.
+        // Adjust button font and color.
         returnPanelBtn.setFont(HealthDiary.SMALL_BTN_FONT);
-        // Adjust button color.
         returnPanelBtn.setForeground(HealthDiary.BTN_FG_COLOR);
         returnPanelBtn.setBackground(HealthDiary.BTN_BG_COLOR);
         // Adjust button action.
         returnPanelBtn.setActionCommand("Last Panel");
         returnPanelBtn.addActionListener(viewAllRecord);
         returnPanelBtn.setFocusable(false);
-
+        // Add to Content Page.
         viewAllRecord.add(returnPanelBtn, BorderLayout.NORTH);
 
+        // ----------------------------------------------------------------------------------------------------
         // Heading for View All Record.
-        viewAllRecordHeading = new JLabel("All Records");
-        // Adjust heading font.
+        JLabel viewAllRecordHeading = new JLabel("All Records");
+        // Adjust heading font and color.
         viewAllRecordHeading.setFont(HealthDiary.MAIN_FONT);
-        // Adjust heading color.
         viewAllRecordHeading.setForeground(HealthDiary.TEXT_COLOR);
 
         viewAllRecord.add(viewAllRecordHeading, BorderLayout.CENTER);
