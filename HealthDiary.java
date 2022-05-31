@@ -5,6 +5,8 @@
 //     - YUKI CHUNG PEI YING (77237)
 //     - ANDREA ANG XIAO XUAN (73347)
 // Health Diary App: Main Function in this file.
+import java.io.File;
+
 import java.awt.*;
 import javax.swing.*;
 
@@ -19,9 +21,14 @@ public class HealthDiary {
     public static final Color VALUE_BG_COLOR = new Color(181, 234, 242);
     public static final Color BTN_BG_COLOR = new Color(16, 164, 204);
     public static final Color BTN_FG_COLOR = TEXT_COLOR;
+    public static final Color POSITIVE_COLOR = new Color(97, 219, 37);
+    public static final Color NEGATIVE_COLOR = new Color(237, 25, 14);
     // Image.
     public static final ImageIcon APP_ICON = new ImageIcon("./img/HealthDiary_Icon.png");
     public static final ImageIcon PROFILE_ICON = new ImageIcon("./img/Profile_Icon.png");
+    public static final ImageIcon EDIT_PROFILE_ICON = new ImageIcon("./img/EditProfile_Icon.png");
+    // Data File.
+    public static final File PROFILE_FILE = new File("./data/UserProfile_Data.txt");
     // Font.
     public static final Font MAIN_FONT = new Font("Comic Sans", Font.BOLD, 20);
     public static final Font BTN_FONT = new Font("Comic Sans", Font.BOLD, 15);
@@ -30,6 +37,8 @@ public class HealthDiary {
     // Unicode special character.
     public static final char UNI_CROSS = '\u26E8';  // https://unicode-table.com/en/26E8/
     public static final char UNI_RETURN_ARROW = '\u21A9';  // https://unicode-table.com/en/21A9/
+    public static final char UNI_MALE = '\u2642';  // https://unicode-table.com/en/2642/
+    public static final char UNI_FEMALE = '\u2640';  // https://unicode-table.com/en/2640/
 
     public static void main(String[] args) {
         // New app frame.

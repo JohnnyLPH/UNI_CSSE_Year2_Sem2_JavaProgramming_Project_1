@@ -13,8 +13,6 @@ import javax.swing.*;
 public class GraphPanel extends ContentPanel {
     // Content Page.
     private ContentPage monthlyReport, weeklyReport, yearlyReport;
-    // Button.
-    private JButton returnPanelBtn;
 
     // Constructor.
     public GraphPanel(ContentPanel lastContentPanel) {
@@ -25,18 +23,19 @@ public class GraphPanel extends ContentPanel {
     }
 
     // Method.
-    public void addMonthlyReport() {
+    // Add Monthly Report Page.
+    private void addMonthlyReport() {
         monthlyReport = new ContentPage(this);
         monthlyReport.setLayout(new BorderLayout());
 
         // ----------------------------------------------------------------------------------------------------
         // Button for redirecting to Last Panel.
-        returnPanelBtn = new JButton(HealthDiary.UNI_RETURN_ARROW + " Back");
-        // Adjust button font and color.
+        JButton returnPanelBtn = new JButton(HealthDiary.UNI_RETURN_ARROW + " Back");
+        // Adjust font and color.
         returnPanelBtn.setFont(HealthDiary.SMALL_BTN_FONT);
         returnPanelBtn.setForeground(HealthDiary.BTN_FG_COLOR);
         returnPanelBtn.setBackground(HealthDiary.BTN_BG_COLOR);
-        // Adjust button action.
+        // Adjust action.
         returnPanelBtn.setActionCommand("Last Panel");
         returnPanelBtn.addActionListener(monthlyReport);
         returnPanelBtn.setFocusable(false);
@@ -46,7 +45,7 @@ public class GraphPanel extends ContentPanel {
         // ----------------------------------------------------------------------------------------------------
         // Heading for Monthly Report.
         JLabel monthlyReportHeading = new JLabel("Monthly Report (Last 12 Months)");
-        // Adjust heading font and color.
+        // Adjust font and color.
         monthlyReportHeading.setFont(HealthDiary.MAIN_FONT);
         monthlyReportHeading.setForeground(HealthDiary.TEXT_COLOR);
 
