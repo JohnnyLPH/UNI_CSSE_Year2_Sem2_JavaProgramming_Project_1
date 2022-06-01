@@ -58,26 +58,26 @@ public class ContentPanel extends JPanel {
     }
 
     // Remove Content Page or Content Panel.
-    public boolean removePage(String pageName) {
-        if (!this.allPages.contains(pageName)) {
-            return false;
-        }
+    // public boolean removePage(String pageName) {
+    //     if (!this.allPages.contains(pageName)) {
+    //         return false;
+    //     }
 
-        // Get objects of all pages in current Content Panel.
-        Component[] components = this.getComponents();
+    //     // Get objects of all pages in current Content Panel.
+    //     Component[] components = this.getComponents();
 
-        // Find the object of the page to remove.
-        for(int i = 0; i < components.length; i++) {
-            if (components[i].getName().equals(pageName)) {
-                components[i].setVisible(false);
-                ((CardLayout) this.getLayout()).removeLayoutComponent(components[i]);
+    //     // Find the object of the page to remove.
+    //     for(int i = 0; i < components.length; i++) {
+    //         if (components[i].getName().equals(pageName)) {
+    //             components[i].setVisible(false);
+    //             ((CardLayout) this.getLayout()).removeLayoutComponent(components[i]);
 
-                this.allPages.remove(pageName);
-                return true;
-            }
-        }
-        return false;
-    }
+    //             this.allPages.remove(pageName);
+    //             return true;
+    //         }
+    //     }
+    //     return false;
+    // }
 
     // Switch page using page index in allPages [0 <= x < size)].
     public boolean switchPage(int pageIndex) {

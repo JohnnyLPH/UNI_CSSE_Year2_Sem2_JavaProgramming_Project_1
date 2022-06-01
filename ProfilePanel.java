@@ -19,6 +19,8 @@ import javax.swing.plaf.InsetsUIResource;
 public class ProfilePanel extends ContentPanel {
     // Content Page.
     private ContentPage viewProfile, editProfile;
+    // User Profile.
+    private UserProfile userProfile;
     // Text Field for data value and input.
     private JTextField nameValue, nameInput;
     // Label for data value.
@@ -29,8 +31,6 @@ public class ProfilePanel extends ContentPanel {
     private JRadioButton maleRadioBtn, femaleRadioBtn;
     // Combo Box for input.
     private JComboBox<String> bloodComboBox;
-    // User Profile.
-    private UserProfile userProfile;
 
     // Constructor.
     public ProfilePanel(ContentPanel lastContentPanel) {
@@ -572,7 +572,6 @@ public class ProfilePanel extends ContentPanel {
         gridBagC.gridx = 1;
         gridBagC.fill = GridBagConstraints.HORIZONTAL;
         editProfileContent.add(bloodComboBox, gridBagC);
-
 
         // ----------------------------------------------------------------------------------------------------
         // Label for health history.
