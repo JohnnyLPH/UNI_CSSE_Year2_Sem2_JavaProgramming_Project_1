@@ -17,7 +17,7 @@ public class HealthRecord {
     public static final String[] SORT_ORDER = {"Ascend", "Descend"};
 
     // Decimal Format (for displaying 1 decimal point).
-    public static final DecimalFormat valueFormat = new DecimalFormat("0.0");
+    public static final DecimalFormat VALUE_FORMAT = new DecimalFormat("0.0");
 
     // Height in cm, Weight in kg, Temperature in Celcius.
     // BMI formula = weight in kg / (height in m ^ 2).
@@ -113,8 +113,8 @@ public class HealthRecord {
     public String toString() {
         // Display date, weight and BMI only.
         String resultStr = "Date: " + getDateTimeStr() + "\n";
-        resultStr += "Weight: " + valueFormat.format(weight) + ", ";
-        resultStr += "BMI: " + valueFormat.format(bmi);
+        resultStr += "Weight: " + VALUE_FORMAT.format(weight) + ", ";
+        resultStr += "BMI: " + VALUE_FORMAT.format(bmi);
         return resultStr;
     }
 

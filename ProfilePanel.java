@@ -37,8 +37,10 @@ public class ProfilePanel extends ContentPanel {
         super(lastContentPanel);
 
         readProfileFile();
+
         addViewProfile();
         addEditProfile();
+        
         refreshProfilePage(2);
         return;
     }

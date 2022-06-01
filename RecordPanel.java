@@ -25,16 +25,27 @@ public class RecordPanel extends ContentPanel {
     private ArrayList<HealthRecord> allRecord;
     // Combo Box for sorting criteria and order.
     private JComboBox<String> sortCriBox, sortOrderBox;
+    // Scroll pane for panel displaying all records.
+    private JScrollPane recordScrollPane;
     // Panel for displaying all records with different sorting.
     private JPanel recordSortContent;
+    // Index of current displaying record.
+    private int currentRecord;
 
     // Constructor.
     public RecordPanel(ContentPanel lastContentPanel) {
         super(lastContentPanel);
+        currentRecord = 0;
 
         readRecordFile();
+
         addViewAllRecord();
         refreshAllRecordPage();
+
+        addViewEachRecord();
+        addAddRecord();
+        addEditRecord();
+        addDeleteRecord();
         return;
     }
 
@@ -65,7 +76,7 @@ public class RecordPanel extends ContentPanel {
                     tempRecord.setBodyTemp(Double.parseDouble(tokens[2].strip()));
 
                     // Read dateTime.
-                    // tempRecord.setDateTime(Long.parseLong(tokens[3].strip()));
+                    tempRecord.setDateTime(Long.parseLong(tokens[3].strip()));
 
                     // Add to list.
                     allRecord.add(tempRecord);
@@ -161,6 +172,7 @@ public class RecordPanel extends ContentPanel {
         ItemListener changeSort = new ItemListener() {
             @Override
             public void itemStateChanged(ItemEvent e) {
+                // Refresh when new criteria or order is selected.
                 if (e.getStateChange() == ItemEvent.SELECTED) {
                     refreshAllRecordPage();
                 }
@@ -204,7 +216,6 @@ public class RecordPanel extends ContentPanel {
         gridBagC.fill = GridBagConstraints.HORIZONTAL;
         headingContent.add(sortOptionPanel, gridBagC);
 
-
         // ----------------------------------------------------------------------------------------------------
         // Panel for displaying all records with different sorting.
         recordSortContent = new JPanel();
@@ -214,16 +225,82 @@ public class RecordPanel extends ContentPanel {
 
         // ----------------------------------------------------------------------------------------------------
         // Scroll pane for panel displaying all records.
-        JScrollPane recordScrollPane = new JScrollPane(recordSortContent);
-        recordScrollPane.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 0));
+        recordScrollPane = new JScrollPane(recordSortContent);
+        recordScrollPane.setBorder(BorderFactory.createEmptyBorder());
         // Adjust scrolling speed.
         recordScrollPane.getVerticalScrollBar().setUnitIncrement(24);
         viewAllRecordContent.add(recordScrollPane, BorderLayout.CENTER);
 
         // ----------------------------------------------------------------------------------------------------
+        // Modified ActionListener for redirecting to Add Record Page.
+        ActionListener toAddPage = new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                // Refresh first to clear previous inputs.
+                refreshAddRecordPage();
+                viewAllRecord.actionPerformed(e);
+                return;
+            }
+        };
+
+        // ----------------------------------------------------------------------------------------------------
+        // Button for redirecting to Edit Profile Page.
+        JButton toAddPageBtn = new JButton("Add New Record");
+        // Adjust font and color.
+        toAddPageBtn.setFont(HealthDiary.BTN_FONT);
+        toAddPageBtn.setForeground(HealthDiary.BTN_FG_COLOR);
+        toAddPageBtn.setBackground(HealthDiary.POSITIVE_COLOR);
+        // Adjust action.
+        toAddPageBtn.setActionCommand("Add Record");
+        toAddPageBtn.addActionListener(toAddPage);
+        toAddPageBtn.setFocusable(false);
+        toAddPageBtn.setBorder(BorderFactory.createCompoundBorder(
+            BorderFactory.createLineBorder(HealthDiary.BTN_FG_COLOR, 3, true),
+            BorderFactory.createEmptyBorder(10, 25, 10, 25)
+        ));
+        // toAddPageBtn.setAlignmentX(Component.CENTER_ALIGNMENT);
+        toAddPageBtn.setMinimumSize(new Dimension(200, 50));
+        viewAllRecordContent.add(toAddPageBtn, BorderLayout.SOUTH);
+
+        // ----------------------------------------------------------------------------------------------------
         // Add content to Content Page.
         viewAllRecord.add(viewAllRecordContent, BorderLayout.CENTER);
         addPage(viewAllRecord, "View All Record", 0);
+        return;
+    }
+
+    // Add View Each Record Page.
+    private void addViewEachRecord() {
+        return;
+    }
+
+    // Add Add Record Page.
+    private void addAddRecord() {
+        return;
+    }
+
+    // Add Edit Record Page.
+    private void addEditRecord() {
+        return;
+    }
+
+    // Add Delete Record Page.
+    private void addDeleteRecord() {
+        return;
+    }
+
+    // Add new Health Record to list.
+    private void addListRecord() {
+        return;
+    }
+
+    // Update Health Record in list.
+    private void updateListRecord() {
+        return;
+    }
+
+    // Delete Health Record from list.
+    private void deleteListRecord() {
         return;
     }
 
@@ -238,55 +315,101 @@ public class RecordPanel extends ContentPanel {
         //     " " + allSortOrder[sortOrderBox.getSelectedIndex()]
         // );
 
+        // Scroll back to top.
+        recordScrollPane.getVerticalScrollBar().setValue(0);
+
         // Remove all components in record sort content.
         recordSortContent.removeAll();
         recordSortContent.revalidate();
         recordSortContent.repaint();
         
-        JButton tempRecordBtn;
-        // Readding to record sort content.
-        for (int i = 0; i < allRecord.size(); i++) {
-            // Space in-between.
-            if (i > 0) {
-                recordSortContent.add(Box.createRigidArea(new Dimension(0, 15)));
-            }
-
-            // ----------------------------------------------------------------------------------------------------
-            // Button for redirecting to View Each Record Page.
-            // Use HTML to allow display of multiline text.
-            tempRecordBtn = new JButton(
-                "<html>" +
-                allRecord.get(i).toString().replaceAll("\\n", "<br>") +
-                "</html>"
-            );
-            // Adjust button font and color.
-            tempRecordBtn.setFont(HealthDiary.BTN_FONT);
-            tempRecordBtn.setForeground(HealthDiary.VALUE_FG_COLOR);
-            tempRecordBtn.setBackground(HealthDiary.VALUE_BG_COLOR);
-            // Adjust button border.
-            tempRecordBtn.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createLineBorder(HealthDiary.BTN_FG_COLOR, 4, true),
-                BorderFactory.createEmptyBorder(10, 10, 10, 10)
-            ));
-
-            // Adjust button action.
-            final int recordIndex = i;
-            tempRecordBtn.setActionCommand("View Each Record");
-            tempRecordBtn.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    // Refresh View Each Record Page before redirecting.
-                    refreshEachRecordPage(recordIndex);
-                    viewAllRecord.actionPerformed(e);
+        // Display record.
+        if (allRecord.size() > 0) {
+            JButton tempRecordBtn;
+            JLabel dateLb, weightLb, bmiLb;
+            GridBagConstraints gridBagC;
+            // Readding to record sort content.
+            for (int i = 0; i < allRecord.size(); i++) {
+                // Space in-between.
+                if (i > 0) {
+                    recordSortContent.add(Box.createRigidArea(new Dimension(0, 10)));
                 }
-            }
-            );
-            tempRecordBtn.setFocusable(false);
-            tempRecordBtn.setMaximumSize(new Dimension(300, 50));
-            tempRecordBtn.setAlignmentX(Component.CENTER_ALIGNMENT);
+    
+                // ----------------------------------------------------------------------------------------------------
+                // Button for redirecting to View Each Record Page.
+                // Use GridBagLayout for formatting button.
+                tempRecordBtn = new JButton();
+                tempRecordBtn.setLayout(new GridBagLayout());
 
-            // Add button to record sort content.
-            recordSortContent.add(tempRecordBtn);
+                // Add labels for date, weight, and BMI.
+                dateLb = new JLabel("Date: " + allRecord.get(i).getDateTimeStr());
+                weightLb = new JLabel("Weight: " + HealthRecord.VALUE_FORMAT.format(allRecord.get(i).getWeight()));
+                bmiLb = new JLabel("BMI: " + HealthRecord.VALUE_FORMAT.format(allRecord.get(i).getBMI()));
+                // Adjust labels font and color.
+                dateLb.setFont(HealthDiary.BTN_FONT);
+                weightLb.setFont(HealthDiary.BTN_FONT);
+                bmiLb.setFont(HealthDiary.BTN_FONT);
+                dateLb.setForeground(HealthDiary.VALUE_FG_COLOR);
+                weightLb.setForeground(HealthDiary.VALUE_FG_COLOR);
+                bmiLb.setForeground(HealthDiary.VALUE_FG_COLOR);
+                dateLb.setHorizontalAlignment(JLabel.CENTER);
+                weightLb.setHorizontalAlignment(JLabel.LEFT);
+                bmiLb.setHorizontalAlignment(JLabel.RIGHT);
+                // Adjust border.
+                dateLb.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+                weightLb.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+                bmiLb.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+                // Add labels to button.
+                gridBagC = new GridBagConstraints();
+                gridBagC.gridwidth = GridBagConstraints.REMAINDER;
+                gridBagC.gridy = 0;
+                gridBagC.gridx = 0;
+                gridBagC.fill = GridBagConstraints.HORIZONTAL;
+                tempRecordBtn.add(dateLb, gridBagC);
+                gridBagC.gridwidth = 1;
+                gridBagC.gridy = 1;
+                gridBagC.gridx = 0;
+                tempRecordBtn.add(weightLb, gridBagC);
+                gridBagC.gridx = 1;
+                tempRecordBtn.add(bmiLb, gridBagC);
+
+
+                // Adjust button color.
+                tempRecordBtn.setBackground(HealthDiary.VALUE_BG_COLOR);
+                // Adjust button border.
+                tempRecordBtn.setBorder(BorderFactory.createCompoundBorder(
+                    BorderFactory.createLineBorder(HealthDiary.BTN_FG_COLOR, 4, true),
+                    BorderFactory.createEmptyBorder(5, 10, 5, 10)
+                ));
+    
+                // Adjust button action.
+                final int recordIndex = i;
+                tempRecordBtn.setActionCommand("View Each Record");
+                tempRecordBtn.addActionListener(new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        // Refresh View Each Record Page before redirecting.
+                        currentRecord = recordIndex;
+                        refreshEachRecordPage(recordIndex);
+                        viewAllRecord.actionPerformed(e);
+                    }
+                }
+                );
+                tempRecordBtn.setFocusable(false);
+                tempRecordBtn.setAlignmentX(Component.CENTER_ALIGNMENT);
+    
+                // Add button to record sort content.
+                recordSortContent.add(tempRecordBtn);
+            }
+        }
+        // No record to display.
+        else {
+            JLabel emptyInfo = new JLabel("No Record is found :(");
+            emptyInfo.setFont(HealthDiary.BTN_FONT);
+            emptyInfo.setForeground(HealthDiary.VALUE_FG_COLOR);
+            emptyInfo.setHorizontalAlignment(JLabel.CENTER);
+            emptyInfo.setAlignmentX(Component.CENTER_ALIGNMENT);
+            recordSortContent.add(emptyInfo);
         }
         return;
     }
@@ -296,4 +419,11 @@ public class RecordPanel extends ContentPanel {
 
         return;
     }
+
+    // Refresh Add Record Page for adding new Health Record.
+    private void refreshAddRecordPage() {
+
+        return;
+    }
+
 }
