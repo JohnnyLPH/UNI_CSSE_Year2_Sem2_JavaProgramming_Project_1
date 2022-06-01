@@ -20,7 +20,7 @@ public class ContentPanel extends JPanel {
     // Constructor.
     public ContentPanel() {
         setLayout(new CardLayout());
-        setBackground(HealthDiary.BG_COLOR);
+        setBackground(HealthDiary.BLACK_BG_COLOR);
         // This is a top Content Panel.
         this.lastContentPanel = null;
         this.allPages = new ArrayList<String>();
@@ -29,7 +29,7 @@ public class ContentPanel extends JPanel {
 
     public ContentPanel(ContentPanel lastContentPanel) {
         setLayout(new CardLayout());
-        setBackground(HealthDiary.BG_COLOR);
+        setBackground(HealthDiary.BLACK_BG_COLOR);
         // This Content Panel is within another Content Panel.
         this.lastContentPanel = lastContentPanel;
         this.allPages = new ArrayList<String>();

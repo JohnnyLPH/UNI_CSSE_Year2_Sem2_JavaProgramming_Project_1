@@ -11,9 +11,8 @@ import javax.swing.*;
 
 
 public class GraphPanel extends ContentPanel {
+    // Content Page.
     private ContentPage monthlyReport, weeklyReport, yearlyReport;
-    private JLabel monthlyReportHeading;
-    private JButton returnPanelBtn;
 
     // Constructor.
     public GraphPanel(ContentPanel lastContentPanel) {
@@ -24,29 +23,30 @@ public class GraphPanel extends ContentPanel {
     }
 
     // Method.
-    public void addMonthlyReport() {
+    // Add Monthly Report Page.
+    private void addMonthlyReport() {
         monthlyReport = new ContentPage(this);
         monthlyReport.setLayout(new BorderLayout());
 
+        // ----------------------------------------------------------------------------------------------------
         // Button for redirecting to Last Panel.
-        returnPanelBtn = new JButton(HealthDiary.UNI_RETURN_ARROW + " Back");
-        // Adjust button font.
+        JButton returnPanelBtn = new JButton(HealthDiary.UNI_RETURN_ARROW + " Back");
+        // Adjust font and color.
         returnPanelBtn.setFont(HealthDiary.SMALL_BTN_FONT);
-        // Adjust button color.
         returnPanelBtn.setForeground(HealthDiary.BTN_FG_COLOR);
         returnPanelBtn.setBackground(HealthDiary.BTN_BG_COLOR);
-        // Adjust button action.
+        // Adjust action.
         returnPanelBtn.setActionCommand("Last Panel");
         returnPanelBtn.addActionListener(monthlyReport);
         returnPanelBtn.setFocusable(false);
-
+        // Add to Content Page.
         monthlyReport.add(returnPanelBtn, BorderLayout.NORTH);
 
+        // ----------------------------------------------------------------------------------------------------
         // Heading for Monthly Report.
-        monthlyReportHeading = new JLabel("Monthly Report (Last 12 Months)");
-        // Adjust heading font.
+        JLabel monthlyReportHeading = new JLabel("Monthly Report (Last 12 Months)");
+        // Adjust font and color.
         monthlyReportHeading.setFont(HealthDiary.MAIN_FONT);
-        // Adjust heading color.
         monthlyReportHeading.setForeground(HealthDiary.TEXT_COLOR);
 
         monthlyReport.add(monthlyReportHeading, BorderLayout.CENTER);

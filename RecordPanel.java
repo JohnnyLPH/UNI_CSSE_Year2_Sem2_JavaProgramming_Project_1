@@ -11,9 +11,8 @@ import javax.swing.*;
 
 
 public class RecordPanel extends ContentPanel {
+    // Content Page.
     private ContentPage viewAllRecord, viewEachRecord, addRecord, editRecord, deleteRecord;
-    private JLabel viewAllRecordHeading;
-    private JButton returnPanelBtn;
 
     // Constructor.
     public RecordPanel(ContentPanel lastContentPanel) {
@@ -24,29 +23,30 @@ public class RecordPanel extends ContentPanel {
     }
 
     // Method.
-    public void addViewAllRecord() {
+    // Add View All Record Page.
+    private void addViewAllRecord() {
         viewAllRecord = new ContentPage(this);
         viewAllRecord.setLayout(new BorderLayout());
 
+        // ----------------------------------------------------------------------------------------------------
         // Button for redirecting to Last Panel.
-        returnPanelBtn = new JButton(HealthDiary.UNI_RETURN_ARROW + " Back");
-        // Adjust button font.
+        JButton returnPanelBtn = new JButton(HealthDiary.UNI_RETURN_ARROW + " Back");
+        // Adjust font and color.
         returnPanelBtn.setFont(HealthDiary.SMALL_BTN_FONT);
-        // Adjust button color.
         returnPanelBtn.setForeground(HealthDiary.BTN_FG_COLOR);
         returnPanelBtn.setBackground(HealthDiary.BTN_BG_COLOR);
-        // Adjust button action.
+        // Adjust action.
         returnPanelBtn.setActionCommand("Last Panel");
         returnPanelBtn.addActionListener(viewAllRecord);
         returnPanelBtn.setFocusable(false);
-
+        // Add to Content Page.
         viewAllRecord.add(returnPanelBtn, BorderLayout.NORTH);
 
+        // ----------------------------------------------------------------------------------------------------
         // Heading for View All Record.
-        viewAllRecordHeading = new JLabel("All Records");
-        // Adjust heading font.
+        JLabel viewAllRecordHeading = new JLabel("All Records");
+        // Adjust font and color.
         viewAllRecordHeading.setFont(HealthDiary.MAIN_FONT);
-        // Adjust heading color.
         viewAllRecordHeading.setForeground(HealthDiary.TEXT_COLOR);
 
         viewAllRecord.add(viewAllRecordHeading, BorderLayout.CENTER);

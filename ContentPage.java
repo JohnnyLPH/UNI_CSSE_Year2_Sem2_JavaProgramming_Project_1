@@ -30,7 +30,7 @@ public class ContentPage extends JPanel implements ActionListener {
     // Constructor.
     public ContentPage(ContentPanel contentPanel) {
         this.contentPanel = contentPanel;
-        setBackground(HealthDiary.BG_COLOR);
+        setBackground(HealthDiary.BLACK_BG_COLOR);
         return;
     }
 
@@ -40,6 +40,13 @@ public class ContentPage extends JPanel implements ActionListener {
     }
 
     // Method.
+    // Display this Content Page in the containing Content Panel.
+    public void display() {
+        // Assuming name of this Content Page is set, which should be done when adding it to Content Panel.
+        this.contentPanel.switchPage(this.getName());
+        return;
+    }
+
     // Needed if use private class, otherwise comment out.
     // public RedirectListener getNewRedirectListener() {
     //     return new RedirectListener();
