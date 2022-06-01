@@ -6,16 +6,22 @@
 //     - ANDREA ANG XIAO XUAN (73347)
 // Health Diary App: Health Record.
 // To be used in Record Panel and Graph Panel.
+import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
 
 public class HealthRecord {
-    // Height in cm.
-    // Weight in kg.
-    // Temperature in Celcius.
+    // Sorting criteria and order.
+    public static final String[] SORT_CRITERIA = {"Date", "Weight", "BMI"};
+    public static final String[] SORT_ORDER = {"Ascend", "Descend"};
+
+    // Decimal Format (for displaying 1 decimal point).
+    public static final DecimalFormat valueFormat = new DecimalFormat("0.0");
+
+    // Height in cm, Weight in kg, Temperature in Celcius.
     // BMI formula = weight in kg / (height in m ^ 2).
-    private float height, weight, bodyTemp, bmi;
+    private double height, weight, bodyTemp, bmi;
     // Refer: https://www.tutorialspoint.com/java/java_date_time.htm
     private Date dateTime;
     private SimpleDateFormat dateFormat;
@@ -36,7 +42,7 @@ public class HealthRecord {
     }
 
     // Setter.
-    public boolean setHeight(float newHeight) {
+    public boolean setHeight(double newHeight) {
         if (newHeight < 50 || newHeight > 250) {
             return false;
         }
@@ -44,7 +50,7 @@ public class HealthRecord {
         return updateBMI();
     }
 
-    public boolean setWeight(float newWeight) {
+    public boolean setWeight(double newWeight) {
         if (newWeight < 5 || newWeight > 500) {
             return false;
         }
@@ -52,7 +58,7 @@ public class HealthRecord {
         return updateBMI();
     }
 
-    public boolean setBodyTemp(float newTemp) {
+    public boolean setBodyTemp(double newTemp) {
         if (newTemp < 25 || newTemp > 50) {
             return false;
         }
@@ -78,19 +84,19 @@ public class HealthRecord {
     }
 
     // Getter.
-    public float getHeight() {
+    public double getHeight() {
         return height;
     }
 
-    public float getWeight() {
+    public double getWeight() {
         return weight;
     }
 
-    public float getBodyTemp() {
+    public double getBodyTemp() {
         return bodyTemp;
     }
 
-    public float getBMI() {
+    public double getBMI() {
         return bmi;
     }
 
@@ -103,6 +109,15 @@ public class HealthRecord {
     }
 
     // Method.
+    // String representation for easy display of each record in list.
+    public String toString() {
+        // Display date, weight and BMI only.
+        String resultStr = "Date: " + getDateTimeStr() + "\n";
+        resultStr += "Weight: " + valueFormat.format(weight) + ", ";
+        resultStr += "BMI: " + valueFormat.format(bmi);
+        return resultStr;
+    }
+
     // Update BMI value using set height and weight.
     private boolean updateBMI() {
         try {
