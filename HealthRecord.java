@@ -16,18 +16,18 @@ public class HealthRecord {
     public static final String[] SORT_CRITERIA = {"Date", "Weight", "BMI"};
     public static final String[] SORT_ORDER = {"Ascend", "Descend"};
 
+    // Underweight (Below 18.5), Healthy (18.5 - 24.9), Overweight (25.0 - 29.9), Obese (30.0 and above).
+    public static final String[] BMI_STATUS = {"Underweight", "Healthy", "Overweight", "Obese"};
+
     // Decimal Format (for displaying 1 decimal point).
     public static final DecimalFormat VALUE_FORMAT = new DecimalFormat("0.0");
 
-    // Height in cm, Weight in kg, Temperature in Celcius.
+    // Height in cm, Weight in kg, Temperature in Celsius.
     // BMI formula = weight in kg / (height in m ^ 2).
     private double height, weight, bodyTemp, bmi;
     // Refer: https://www.tutorialspoint.com/java/java_date_time.htm
     private Date dateTime;
     private SimpleDateFormat dateFormat;
-
-    // Underweight (Below 18.5), Healthy (18.5 - 24.9), Overweight (25.0 - 29.9), Obese (30.0 and above).
-    public static final String[] bmiStatus = {"Underweight", "Healthy", "Overweight", "Obese"};
 
     // Constructor.
     public HealthRecord() {
@@ -109,20 +109,13 @@ public class HealthRecord {
     }
 
     // Method.
-    // String representation for easy display of each record in list.
-    public String toString() {
-        // Display date, weight and BMI only.
-        String resultStr = "Date: " + getDateTimeStr() + "\n";
-        resultStr += "Weight: " + VALUE_FORMAT.format(weight) + ", ";
-        resultStr += "BMI: " + VALUE_FORMAT.format(bmi);
-        return resultStr;
-    }
-
-    // Update BMI value using set height and weight.
+    // Update BMI value with new height or weight.
     private boolean updateBMI() {
         try {
             // BMI formula = weight in kg / (height in m ^ 2).
             bmi = weight / ((height / 100) * (height / 100));
+            // Round value to 1 decimal point to change precision.
+            bmi = Math.round(bmi * 10) / 10.0;
             return true;
         }
         catch (Exception errorMsg) {
@@ -131,18 +124,34 @@ public class HealthRecord {
         }
     }
 
-    // Get status of current BMI.
-    public String getStatus() {
+    // Get status index of current BMI.
+    public int getStatusIndex() {
         // Underweight (Below 18.5), Healthy (18.5 - 24.9), Overweight (25.0 - 29.9), Obese (30.0 and above).
-        if (bmi < 18.5) {
-            return bmiStatus[0];
+        if (bmi < 18.50) {
+            return 0;
         }
-        else if (bmi < 25.0) {
-            return bmiStatus[1];
+        else if (bmi < 25.00) {
+            return 1;
         }
-        else if (bmi < 30.0) {
-            return bmiStatus[2];
+        else if (bmi < 30.00) {
+            return 2;
         }
-        return bmiStatus[3];
+        return 3;
+    }
+
+    // Get status string of current BMI.
+    public String getStatusStr() {
+        // Underweight (Below 18.5), Healthy (18.5 - 24.9), Overweight (25.0 - 29.9), Obese (30.0 and above).
+        return BMI_STATUS[getStatusIndex()];
+    }
+
+    // Get health advice based on current BMI.
+    public String getHealthAdvice() {
+        int statusIndex = getStatusIndex();
+        // Underweight, need to gain weight.
+        if (statusIndex == 0) {
+
+        }
+        return "Testing Testing";
     }
 }

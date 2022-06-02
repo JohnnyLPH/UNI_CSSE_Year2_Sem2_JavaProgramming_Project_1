@@ -32,12 +32,14 @@ public class RecordPanel extends ContentPanel {
     // Panel for displaying all records with different sorting.
     private JPanel recordSortContent;
     // Index of current displaying record.
-    private int currentRecord;
+    private int recordIndex;
+    // Label for data value.
+    private JLabel dateValue, bodyTempValue, heightValue, weightValue, bmiValue, statusValue;
 
     // Constructor.
     public RecordPanel(ContentPanel lastContentPanel) {
         super(lastContentPanel);
-        currentRecord = 0;
+        recordIndex = 0;
 
         readRecordFile();
 
@@ -63,7 +65,7 @@ public class RecordPanel extends ContentPanel {
                 Scanner sc = new Scanner(HealthDiary.RECORD_FILE);
                 
                 HealthRecord tempRecord;
-                // Read from single line (height, weight, bodyTemp, dateTime).
+                // Read from single line (height, weight, body temperature, datetime).
                 while (sc.hasNextLine()) {
                     tempRecord = new HealthRecord();
                     String[] tokens = sc.nextLine().split(",");
@@ -74,10 +76,10 @@ public class RecordPanel extends ContentPanel {
                     // Read weight.
                     tempRecord.setWeight(Double.parseDouble(tokens[1].strip()));
 
-                    // Read bodyTemp.
+                    // Read  body temperature.
                     tempRecord.setBodyTemp(Double.parseDouble(tokens[2].strip()));
 
-                    // Read dateTime.
+                    // Read datetime.
                     tempRecord.setDateTime(Long.parseLong(tokens[3].strip()));
 
                     // Add to list.
@@ -231,6 +233,11 @@ public class RecordPanel extends ContentPanel {
         recordScrollPane.setBorder(BorderFactory.createEmptyBorder());
         // Adjust scrolling speed.
         recordScrollPane.getVerticalScrollBar().setUnitIncrement(24);
+        // Adjust scroll bar appearance.
+        recordScrollPane.getVerticalScrollBar().setPreferredSize(new Dimension(10, 0));
+        recordScrollPane.getVerticalScrollBar().setBackground(HealthDiary.THEME_BG_COLOR);
+        recordScrollPane.getHorizontalScrollBar().setPreferredSize(new Dimension(0, 0));
+        // Add to content.
         viewAllRecordContent.add(recordScrollPane, BorderLayout.CENTER);
 
         // ----------------------------------------------------------------------------------------------------
@@ -273,6 +280,323 @@ public class RecordPanel extends ContentPanel {
 
     // Add View Each Record Page.
     private void addViewEachRecord() {
+        viewEachRecord = new ContentPage(this);
+        viewEachRecord.setLayout(new BorderLayout());
+
+        // ----------------------------------------------------------------------------------------------------
+        // Button for redirecting to Last Panel.
+        JButton toViewAllPageBtn = new JButton(HealthDiary.UNI_RETURN_ARROW + " Back");
+        // Adjust font and color.
+        toViewAllPageBtn.setFont(HealthDiary.SMALL_BTN_FONT);
+        toViewAllPageBtn.setForeground(HealthDiary.BTN_FG_COLOR);
+        toViewAllPageBtn.setBackground(HealthDiary.BTN_BG_COLOR);
+        // Adjust action.
+        toViewAllPageBtn.setActionCommand("View All Record");
+        toViewAllPageBtn.addActionListener(viewEachRecord);
+        toViewAllPageBtn.setFocusable(false);
+        // Add to Content Page.
+        viewEachRecord.add(toViewAllPageBtn, BorderLayout.NORTH);
+
+        // ----------------------------------------------------------------------------------------------------
+        // For main content of View Each Record (i.e., all the record fields and values).
+        JPanel viewEachRecordContent = new JPanel(new GridBagLayout());
+        // No reuse, new object for each component.
+        GridBagConstraints gridBagC;
+        viewEachRecordContent.setBackground(HealthDiary.THEME_BG_COLOR);
+
+        // ----------------------------------------------------------------------------------------------------
+        // Heading for View Each Record content.
+        JLabel viewEachRecordHeading = new JLabel("View Selected Record");
+        // Adjust font and color.
+        viewEachRecordHeading.setFont(HealthDiary.MAIN_FONT);
+        viewEachRecordHeading.setForeground(HealthDiary.TEXT_COLOR);
+        viewEachRecordHeading.setHorizontalAlignment(JLabel.CENTER);
+        // Add icon to heading.
+        viewEachRecordHeading.setIcon(new ImageIcon(
+            HealthDiary.EACH_RECORD_ICON.getImage().getScaledInstance(
+                64, 64, java.awt.Image.SCALE_SMOOTH
+            )
+        ));
+        // Add to content.
+        gridBagC = new GridBagConstraints();
+        gridBagC.insets = new InsetsUIResource(10, 5, 15, 5);
+        gridBagC.gridwidth = GridBagConstraints.REMAINDER;
+        gridBagC.gridy = 0;
+        gridBagC.gridx = 0;
+        gridBagC.fill = GridBagConstraints.HORIZONTAL;
+        viewEachRecordContent.add(viewEachRecordHeading, gridBagC);
+
+        // ----------------------------------------------------------------------------------------------------
+        // Label for date.
+        JLabel dateLb = new JLabel("Date:");
+        // Adjust font and color.
+        dateLb.setFont(HealthDiary.LB_FONT);
+        dateLb.setForeground(HealthDiary.TEXT_COLOR);
+        dateLb.setBackground(HealthDiary.BLACK_BG_COLOR);
+        dateLb.setOpaque(true);
+        dateLb.setHorizontalAlignment(JLabel.RIGHT);
+        dateLb.setPreferredSize(new Dimension(100, 30));
+        dateLb.setBorder(BorderFactory.createCompoundBorder(
+            BorderFactory.createLineBorder(HealthDiary.TEXT_COLOR, 2),
+            BorderFactory.createEmptyBorder(0, 5, 0, 5)
+        ));
+        // Add to content.
+        gridBagC = new GridBagConstraints();
+        gridBagC.insets = new InsetsUIResource(5, 5, 5, 2);
+        gridBagC.gridy = 1;
+        gridBagC.gridx = 0;
+        viewEachRecordContent.add(dateLb, gridBagC);
+
+        // ----------------------------------------------------------------------------------------------------
+        // Date value.
+        dateValue = new JLabel();
+        // Adjust font and color.
+        dateValue.setFont(HealthDiary.LB_FONT);
+        dateValue.setForeground(HealthDiary.VALUE_FG_COLOR);
+        dateValue.setBackground(HealthDiary.VALUE_BG_COLOR);
+        dateValue.setOpaque(true);
+        dateValue.setFocusable(false);
+        dateValue.setHorizontalAlignment(JLabel.LEFT);
+        dateValue.setPreferredSize(new Dimension(250, 30));
+        dateValue.setBorder(BorderFactory.createCompoundBorder(
+            BorderFactory.createLineBorder(HealthDiary.VALUE_FG_COLOR, 2),
+            BorderFactory.createEmptyBorder(0, 5, 0, 5)
+        ));
+        // Add to content.
+        gridBagC = new GridBagConstraints();
+        gridBagC.insets = new InsetsUIResource(5, 2, 5, 5);
+        gridBagC.gridwidth = GridBagConstraints.REMAINDER;
+        gridBagC.gridy = 1;
+        gridBagC.gridx = 1;
+        viewEachRecordContent.add(dateValue, gridBagC);
+
+        // ----------------------------------------------------------------------------------------------------
+        // Label for body temperature.
+        JLabel bodyTempLb = new JLabel("Temperature:");
+        // Adjust font and color.
+        bodyTempLb.setFont(HealthDiary.LB_FONT);
+        bodyTempLb.setForeground(HealthDiary.TEXT_COLOR);
+        bodyTempLb.setBackground(HealthDiary.BLACK_BG_COLOR);
+        bodyTempLb.setOpaque(true);
+        bodyTempLb.setHorizontalAlignment(JLabel.RIGHT);
+        bodyTempLb.setPreferredSize(new Dimension(100, 30));
+        bodyTempLb.setBorder(BorderFactory.createCompoundBorder(
+            BorderFactory.createLineBorder(HealthDiary.TEXT_COLOR, 2),
+            BorderFactory.createEmptyBorder(0, 5, 0, 5)
+        ));
+        // Add to content.
+        gridBagC = new GridBagConstraints();
+        gridBagC.insets = new InsetsUIResource(5, 5, 5, 2);
+        gridBagC.gridy = 2;
+        gridBagC.gridx = 0;
+        viewEachRecordContent.add(bodyTempLb, gridBagC);
+
+        // ----------------------------------------------------------------------------------------------------
+        // Body temperature value.
+        bodyTempValue = new JLabel();
+        // Adjust font and color.
+        bodyTempValue.setFont(HealthDiary.LB_FONT);
+        bodyTempValue.setForeground(HealthDiary.VALUE_FG_COLOR);
+        bodyTempValue.setBackground(HealthDiary.VALUE_BG_COLOR);
+        bodyTempValue.setOpaque(true);
+        bodyTempValue.setFocusable(false);
+        bodyTempValue.setHorizontalAlignment(JLabel.LEFT);
+        bodyTempValue.setPreferredSize(new Dimension(250, 30));
+        bodyTempValue.setBorder(BorderFactory.createCompoundBorder(
+            BorderFactory.createLineBorder(HealthDiary.VALUE_FG_COLOR, 2),
+            BorderFactory.createEmptyBorder(0, 5, 0, 5)
+        ));
+        // Add to content.
+        gridBagC = new GridBagConstraints();
+        gridBagC.insets = new InsetsUIResource(5, 2, 5, 5);
+        gridBagC.gridwidth = GridBagConstraints.REMAINDER;
+        gridBagC.gridy = 2;
+        gridBagC.gridx = 1;
+        viewEachRecordContent.add(bodyTempValue, gridBagC);
+
+        // ----------------------------------------------------------------------------------------------------
+        // Label for height.
+        JLabel heightLb = new JLabel("Height:");
+        // Adjust font and color.
+        heightLb.setFont(HealthDiary.LB_FONT);
+        heightLb.setForeground(HealthDiary.TEXT_COLOR);
+        heightLb.setBackground(HealthDiary.BLACK_BG_COLOR);
+        heightLb.setOpaque(true);
+        heightLb.setHorizontalAlignment(JLabel.RIGHT);
+        heightLb.setPreferredSize(new Dimension(100, 30));
+        heightLb.setBorder(BorderFactory.createCompoundBorder(
+            BorderFactory.createLineBorder(HealthDiary.TEXT_COLOR, 2),
+            BorderFactory.createEmptyBorder(0, 5, 0, 5)
+        ));
+        // Add to content.
+        gridBagC = new GridBagConstraints();
+        gridBagC.insets = new InsetsUIResource(5, 5, 5, 2);
+        gridBagC.gridy = 3;
+        gridBagC.gridx = 0;
+        viewEachRecordContent.add(heightLb, gridBagC);
+
+        // ----------------------------------------------------------------------------------------------------
+        // Height value.
+        heightValue = new JLabel();
+        // Adjust font and color.
+        heightValue.setFont(HealthDiary.LB_FONT);
+        heightValue.setForeground(HealthDiary.VALUE_FG_COLOR);
+        heightValue.setBackground(HealthDiary.VALUE_BG_COLOR);
+        heightValue.setOpaque(true);
+        heightValue.setFocusable(false);
+        heightValue.setHorizontalAlignment(JLabel.LEFT);
+        heightValue.setPreferredSize(new Dimension(250, 30));
+        heightValue.setBorder(BorderFactory.createCompoundBorder(
+            BorderFactory.createLineBorder(HealthDiary.VALUE_FG_COLOR, 2),
+            BorderFactory.createEmptyBorder(0, 5, 0, 5)
+        ));
+        // Add to content.
+        gridBagC = new GridBagConstraints();
+        gridBagC.insets = new InsetsUIResource(5, 2, 5, 5);
+        gridBagC.gridwidth = GridBagConstraints.REMAINDER;
+        gridBagC.gridy = 3;
+        gridBagC.gridx = 1;
+        viewEachRecordContent.add(heightValue, gridBagC);
+
+        // ----------------------------------------------------------------------------------------------------
+        // Label for weight.
+        JLabel weightLb = new JLabel("Weight:");
+        // Adjust font and color.
+        weightLb.setFont(HealthDiary.LB_FONT);
+        weightLb.setForeground(HealthDiary.TEXT_COLOR);
+        weightLb.setBackground(HealthDiary.BLACK_BG_COLOR);
+        weightLb.setOpaque(true);
+        weightLb.setHorizontalAlignment(JLabel.RIGHT);
+        weightLb.setPreferredSize(new Dimension(100, 30));
+        weightLb.setBorder(BorderFactory.createCompoundBorder(
+            BorderFactory.createLineBorder(HealthDiary.TEXT_COLOR, 2),
+            BorderFactory.createEmptyBorder(0, 5, 0, 5)
+        ));
+        // Add to content.
+        gridBagC = new GridBagConstraints();
+        gridBagC.insets = new InsetsUIResource(5, 5, 5, 2);
+        gridBagC.gridy = 4;
+        gridBagC.gridx = 0;
+        viewEachRecordContent.add(weightLb, gridBagC);
+
+        // ----------------------------------------------------------------------------------------------------
+        // Weight value.
+        weightValue = new JLabel();
+        // Adjust font and color.
+        weightValue.setFont(HealthDiary.LB_FONT);
+        weightValue.setForeground(HealthDiary.VALUE_FG_COLOR);
+        weightValue.setBackground(HealthDiary.VALUE_BG_COLOR);
+        weightValue.setOpaque(true);
+        weightValue.setFocusable(false);
+        weightValue.setHorizontalAlignment(JLabel.LEFT);
+        weightValue.setPreferredSize(new Dimension(250, 30));
+        weightValue.setBorder(BorderFactory.createCompoundBorder(
+            BorderFactory.createLineBorder(HealthDiary.VALUE_FG_COLOR, 2),
+            BorderFactory.createEmptyBorder(0, 5, 0, 5)
+        ));
+        // Add to content.
+        gridBagC = new GridBagConstraints();
+        gridBagC.insets = new InsetsUIResource(5, 2, 5, 5);
+        gridBagC.gridwidth = GridBagConstraints.REMAINDER;
+        gridBagC.gridy = 4;
+        gridBagC.gridx = 1;
+        viewEachRecordContent.add(weightValue, gridBagC);
+
+        // ----------------------------------------------------------------------------------------------------
+        // Label for BMI.
+        JLabel bmiLb = new JLabel("BMI:");
+        // Adjust font and color.
+        bmiLb.setFont(HealthDiary.LB_FONT);
+        bmiLb.setForeground(HealthDiary.TEXT_COLOR);
+        bmiLb.setBackground(HealthDiary.BLACK_BG_COLOR);
+        bmiLb.setOpaque(true);
+        bmiLb.setHorizontalAlignment(JLabel.RIGHT);
+        bmiLb.setPreferredSize(new Dimension(100, 30));
+        bmiLb.setBorder(BorderFactory.createCompoundBorder(
+            BorderFactory.createLineBorder(HealthDiary.TEXT_COLOR, 2),
+            BorderFactory.createEmptyBorder(0, 5, 0, 5)
+        ));
+        // Add to content.
+        gridBagC = new GridBagConstraints();
+        gridBagC.insets = new InsetsUIResource(5, 5, 5, 2);
+        gridBagC.gridy = 5;
+        gridBagC.gridx = 0;
+        viewEachRecordContent.add(bmiLb, gridBagC);
+
+        // ----------------------------------------------------------------------------------------------------
+        // BMI value.
+        bmiValue = new JLabel();
+        // Adjust font and color.
+        bmiValue.setFont(HealthDiary.LB_FONT);
+        bmiValue.setForeground(HealthDiary.VALUE_FG_COLOR);
+        bmiValue.setBackground(HealthDiary.VALUE_BG_COLOR);
+        bmiValue.setOpaque(true);
+        bmiValue.setFocusable(false);
+        bmiValue.setHorizontalAlignment(JLabel.LEFT);
+        bmiValue.setPreferredSize(new Dimension(250, 30));
+        bmiValue.setBorder(BorderFactory.createCompoundBorder(
+            BorderFactory.createLineBorder(HealthDiary.VALUE_FG_COLOR, 2),
+            BorderFactory.createEmptyBorder(0, 5, 0, 5)
+        ));
+        // Add to content.
+        gridBagC = new GridBagConstraints();
+        gridBagC.insets = new InsetsUIResource(5, 2, 5, 5);
+        gridBagC.gridwidth = GridBagConstraints.REMAINDER;
+        gridBagC.gridy = 5;
+        gridBagC.gridx = 1;
+        viewEachRecordContent.add(bmiValue, gridBagC);
+
+        // ----------------------------------------------------------------------------------------------------
+        // Label for status.
+        JLabel statusLb = new JLabel("Status:");
+        // Adjust font and color.
+        statusLb.setFont(HealthDiary.LB_FONT);
+        statusLb.setForeground(HealthDiary.TEXT_COLOR);
+        statusLb.setBackground(HealthDiary.BLACK_BG_COLOR);
+        statusLb.setOpaque(true);
+        statusLb.setHorizontalAlignment(JLabel.RIGHT);
+        statusLb.setPreferredSize(new Dimension(100, 30));
+        statusLb.setBorder(BorderFactory.createCompoundBorder(
+            BorderFactory.createLineBorder(HealthDiary.TEXT_COLOR, 2),
+            BorderFactory.createEmptyBorder(0, 5, 0, 5)
+        ));
+        // Add to content.
+        gridBagC = new GridBagConstraints();
+        gridBagC.insets = new InsetsUIResource(5, 5, 5, 2);
+        gridBagC.gridy = 6;
+        gridBagC.gridx = 0;
+        viewEachRecordContent.add(statusLb, gridBagC);
+
+        // ----------------------------------------------------------------------------------------------------
+        // Status value.
+        statusValue = new JLabel();
+        // Adjust font and color.
+        statusValue.setFont(HealthDiary.LB_FONT);
+        statusValue.setForeground(HealthDiary.VALUE_FG_COLOR);
+        statusValue.setBackground(HealthDiary.VALUE_BG_COLOR);
+        statusValue.setOpaque(true);
+        statusValue.setFocusable(false);
+        statusValue.setHorizontalAlignment(JLabel.LEFT);
+        statusValue.setPreferredSize(new Dimension(250, 30));
+        statusValue.setBorder(BorderFactory.createCompoundBorder(
+            BorderFactory.createLineBorder(HealthDiary.VALUE_FG_COLOR, 2),
+            BorderFactory.createEmptyBorder(0, 5, 0, 5)
+        ));
+        // Add to content.
+        gridBagC = new GridBagConstraints();
+        gridBagC.insets = new InsetsUIResource(5, 2, 5, 5);
+        gridBagC.gridwidth = GridBagConstraints.REMAINDER;
+        gridBagC.gridy = 6;
+        gridBagC.gridx = 1;
+        viewEachRecordContent.add(statusValue, gridBagC);
+
+        // ----------------------------------------------------------------------------------------------------
+        // Label for health advice.
+
+        // ----------------------------------------------------------------------------------------------------
+        // Add content to Content Page.
+        viewEachRecord.add(viewEachRecordContent, BorderLayout.CENTER);
+        addPage(viewEachRecord, "View Each Record", 1);
         return;
     }
 
@@ -372,11 +696,6 @@ public class RecordPanel extends ContentPanel {
             Collections.reverse(allRecord);
         }
 
-        // System.out.println(
-        //     "Sort Change: " + allSortCri[sortCriBox.getSelectedIndex()] +
-        //     " " + allSortOrder[sortOrderBox.getSelectedIndex()]
-        // );
-
         // ----------------------------------------------------------------------------------------------------
         // Scroll back to top.
         recordScrollPane.getVerticalScrollBar().setValue(0);
@@ -406,13 +725,19 @@ public class RecordPanel extends ContentPanel {
 
                 // ----------------------------------------------------------------------------------------------------
                 // Add labels for date, weight, and BMI.
-                dateLb = new JLabel("Date: " + allRecord.get(i).getDateTimeStr());
-                weightLb = new JLabel("Weight: " + HealthRecord.VALUE_FORMAT.format(allRecord.get(i).getWeight()));
-                bmiLb = new JLabel("BMI: " + HealthRecord.VALUE_FORMAT.format(allRecord.get(i).getBMI()));
+                dateLb = new JLabel(
+                    "Date: " + allRecord.get(i).getDateTimeStr()
+                );
+                weightLb = new JLabel(
+                    "Weight: " + HealthRecord.VALUE_FORMAT.format(allRecord.get(i).getWeight()) + " kg"
+                );
+                bmiLb = new JLabel(
+                    "BMI: " + HealthRecord.VALUE_FORMAT.format(allRecord.get(i).getBMI())
+                );
                 // Adjust labels font and color.
-                dateLb.setFont(HealthDiary.BTN_FONT);
-                weightLb.setFont(HealthDiary.BTN_FONT);
-                bmiLb.setFont(HealthDiary.BTN_FONT);
+                dateLb.setFont(HealthDiary.SMALL_BTN_FONT);
+                weightLb.setFont(HealthDiary.SMALL_BTN_FONT);
+                bmiLb.setFont(HealthDiary.SMALL_BTN_FONT);
                 dateLb.setForeground(HealthDiary.VALUE_FG_COLOR);
                 weightLb.setForeground(HealthDiary.VALUE_FG_COLOR);
                 bmiLb.setForeground(HealthDiary.VALUE_FG_COLOR);
@@ -421,6 +746,7 @@ public class RecordPanel extends ContentPanel {
                 bmiLb.setHorizontalAlignment(JLabel.RIGHT);
                 // Adjust border.
                 dateLb.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+                dateLb.setPreferredSize(new Dimension(250, 30));;
                 weightLb.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
                 bmiLb.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
                 // Add labels to button.
@@ -446,14 +772,14 @@ public class RecordPanel extends ContentPanel {
                     BorderFactory.createEmptyBorder(5, 10, 5, 10)
                 ));
                 // Adjust button action.
-                final int recordIndex = i;
+                final int tempIndex = i;
                 tempRecordBtn.setActionCommand("View Each Record");
                 tempRecordBtn.addActionListener(new ActionListener() {
                     @Override
                     public void actionPerformed(ActionEvent e) {
                         // Refresh View Each Record Page before redirecting.
-                        currentRecord = recordIndex;
-                        refreshEachRecordPage(recordIndex);
+                        recordIndex = tempIndex;
+                        refreshEachRecordPage();
                         viewAllRecord.actionPerformed(e);
                     }
                 }
@@ -477,9 +803,23 @@ public class RecordPanel extends ContentPanel {
         return;
     }
 
-    // Refresh View Each Record Page based on the selected record from View All Record Page.
-    private void refreshEachRecordPage(int recordIndex) {
-
+    // Refresh View Each Record Page based on the selected record.
+    private void refreshEachRecordPage() {
+        dateValue.setText(allRecord.get(recordIndex).getDateTimeStr());
+        bodyTempValue.setText(
+            HealthRecord.VALUE_FORMAT.format(allRecord.get(recordIndex).getBodyTemp()) +
+            " " + HealthDiary.UNI_CELSIUS
+        );
+        heightValue.setText(
+            HealthRecord.VALUE_FORMAT.format(allRecord.get(recordIndex).getHeight()) + " cm"
+        );
+        weightValue.setText(
+            HealthRecord.VALUE_FORMAT.format(allRecord.get(recordIndex).getWeight()) + " kg"
+        );
+        bmiValue.setText(
+            HealthRecord.VALUE_FORMAT.format(allRecord.get(recordIndex).getBMI())
+        );
+        statusValue.setText(allRecord.get(recordIndex).getStatusStr());
         return;
     }
 
