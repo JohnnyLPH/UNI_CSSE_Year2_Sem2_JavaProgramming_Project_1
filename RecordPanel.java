@@ -7,6 +7,8 @@
 // Health Diary App: Record Panel.
 // Contain View All Record Page, View Each Record Page, Add Record Page, Edit Record Page, Delete Record Page.
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Scanner;
 
 import java.awt.*;
@@ -306,23 +308,84 @@ public class RecordPanel extends ContentPanel {
 
     // Refresh records with sorting in View All Record Page.
     private void refreshAllRecordPage() {
-        // Sort the record list.
-        // Criteria (Date, Weight, BMI}), Order (Ascend, Descend).
+        // Sort the record list using modified Comparator.
+        Comparator<HealthRecord> recordComparator;
 
+        // ----------------------------------------------------------------------------------------------------
+        // Criteria (Date, Weight, BMI}).
+        // Sort by Date.
+        if (sortCriBox.getSelectedIndex() == 0) {
+            // Modify Comparator for Date.
+            recordComparator = new Comparator<HealthRecord>() {
+                @Override
+                public int compare(HealthRecord o1, HealthRecord o2) {
+                    if (o1.getDateTimeLong() > o2.getDateTimeLong()) {
+                        return 1;
+                    }
+                    else if (o1.getDateTimeLong() < o2.getDateTimeLong()) {
+                        return -1;
+                    }
+                    return 0;
+                }
+            };
+        }
+        // Sort by Weight.
+        else if (sortCriBox.getSelectedIndex() == 1) {
+            // Modify Comparator for Weight.
+            recordComparator = new Comparator<HealthRecord>() {
+                @Override
+                public int compare(HealthRecord o1, HealthRecord o2) {
+                    if (o1.getWeight() > o2.getWeight()) {
+                        return 1;
+                    }
+                    else if (o1.getWeight() < o2.getWeight()) {
+                        return -1;
+                    }
+                    return 0;
+                }
+            };
+
+        }
+        // Sort by BMI.
+        else {
+            // Modify Comparator for BMI.
+            recordComparator = new Comparator<HealthRecord>() {
+                @Override
+                public int compare(HealthRecord o1, HealthRecord o2) {
+                    if (o1.getBMI() > o2.getBMI()) {
+                        return 1;
+                    }
+                    else if (o1.getBMI() < o2.getBMI()) {
+                        return -1;
+                    }
+                    return 0;
+                }
+            };
+        }
+
+        // ----------------------------------------------------------------------------------------------------
+        // Order (Ascend, Descend).
+        // Sort in ascending order first.
+        Collections.sort(allRecord, recordComparator);
+        // Sort in descending order if needed by reversing the sorted list.
+        if (sortOrderBox.getSelectedIndex() == 0) {
+            Collections.reverse(allRecord);
+        }
 
         // System.out.println(
         //     "Sort Change: " + allSortCri[sortCriBox.getSelectedIndex()] +
         //     " " + allSortOrder[sortOrderBox.getSelectedIndex()]
         // );
 
+        // ----------------------------------------------------------------------------------------------------
         // Scroll back to top.
         recordScrollPane.getVerticalScrollBar().setValue(0);
-
         // Remove all components in record sort content.
         recordSortContent.removeAll();
         recordSortContent.revalidate();
         recordSortContent.repaint();
-        
+
+        // ----------------------------------------------------------------------------------------------------
         // Display record.
         if (allRecord.size() > 0) {
             JButton tempRecordBtn;
@@ -341,6 +404,7 @@ public class RecordPanel extends ContentPanel {
                 tempRecordBtn = new JButton();
                 tempRecordBtn.setLayout(new GridBagLayout());
 
+                // ----------------------------------------------------------------------------------------------------
                 // Add labels for date, weight, and BMI.
                 dateLb = new JLabel("Date: " + allRecord.get(i).getDateTimeStr());
                 weightLb = new JLabel("Weight: " + HealthRecord.VALUE_FORMAT.format(allRecord.get(i).getWeight()));
@@ -373,7 +437,7 @@ public class RecordPanel extends ContentPanel {
                 gridBagC.gridx = 1;
                 tempRecordBtn.add(bmiLb, gridBagC);
 
-
+                // ----------------------------------------------------------------------------------------------------
                 // Adjust button color.
                 tempRecordBtn.setBackground(HealthDiary.VALUE_BG_COLOR);
                 // Adjust button border.
@@ -381,7 +445,6 @@ public class RecordPanel extends ContentPanel {
                     BorderFactory.createLineBorder(HealthDiary.BTN_FG_COLOR, 4, true),
                     BorderFactory.createEmptyBorder(5, 10, 5, 10)
                 ));
-    
                 // Adjust button action.
                 final int recordIndex = i;
                 tempRecordBtn.setActionCommand("View Each Record");
