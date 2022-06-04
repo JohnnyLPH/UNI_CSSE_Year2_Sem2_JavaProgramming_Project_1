@@ -35,10 +35,10 @@ public class RecordPanel extends ContentPanel {
     private JPanel recordSortContent;
     // Index of current displaying record.
     private int recordIndex;
-    // Label for data value.
-    private JLabel dateValue, bodyTempValue, heightValue, weightValue, bmiValue, statusValue;
-    // Combo Box for datetime input.
-    private JComboBox<String> editYearBox, editMonthBox, editDayBox, editHourBox, editMinBox, editMarkerBox;
+    // Label for data value and input messages.
+    private JLabel[] recordValues, editMsgs, addMsgs;
+    // Textfield for input.
+    private JTextField[] editInputs, addInputs;
     // Text Area for advice value.
     private JTextArea adviceValue;
 
@@ -101,15 +101,14 @@ public class RecordPanel extends ContentPanel {
     }
 
     // Write Health Record to file.
-    private void writeRecordFile() {
+    private void writeRecordFile(boolean append) {
         try {
             // Ensure the file is created if not exist.
             HealthDiary.RECORD_FILE.createNewFile();
 
-            FileWriter newWriter = new FileWriter(HealthDiary.RECORD_FILE);
-
+            FileWriter newWriter = new FileWriter(HealthDiary.RECORD_FILE, append);
             // Write each record in single line (height, weight, body temperature, datetime).
-            for (int i = 0; i < allRecord.size(); i++) {
+            for (int i = (append) ? allRecord.size() - 1: 0; i < allRecord.size(); i++) {
                 if (i > 0) {
                     newWriter.write("\n");
                 }
@@ -125,6 +124,67 @@ public class RecordPanel extends ContentPanel {
             System.out.println("Error with file in writeRecordFile().");
         }
         return;
+    }
+
+    // Validate datetime.
+    private boolean validateDateTime(String inputStr) {
+        try {
+            // Format: dd/MM/yyyy hh:mm aa
+            HealthRecord.DATE_FORMAT.parse(inputStr);
+
+            if (inputStr.strip().length() != 19) {
+                return false;
+            }
+        }
+        catch (Exception errorMsg) {
+            return false;
+        }
+        return true;
+    }
+
+    // Validate body temperature.
+    private boolean validateBodyTemp(String inputStr) {
+        try {
+            Double tValue = Double.parseDouble(inputStr);
+            
+            if (tValue < 25 || tValue > 50) {
+                return false;
+            }
+        }
+        catch (Exception errorMsg) {
+            return false;
+        }
+        return true;
+    }
+
+    // Validate height.
+    private boolean validateHeight(String inputStr) {
+        try {
+            Double tValue = Double.parseDouble(inputStr);
+            
+            if (tValue < 50 || tValue > 250) {
+                return false;
+            }
+        }
+        catch (Exception errorMsg) {
+            return false;
+        }
+        return true;
+    }
+
+    // Validate weight.
+    private boolean validateWeight(String inputStr) {
+        try {
+            Double tValue = Double.parseDouble(inputStr);
+            
+            if (tValue < 5 || tValue > 500) {
+                return false;
+            }
+        }
+        catch (Exception errorMsg) {
+            return false;
+        }
+        return true;
     }
 
     // Add View All Record Page.
@@ -360,6 +420,10 @@ public class RecordPanel extends ContentPanel {
         viewEachRecordContent.add(viewEachRecordHeading, gridBagC);
 
         // ----------------------------------------------------------------------------------------------------
+        // Array of data value.
+        recordValues = new JLabel[6];
+
+        // ----------------------------------------------------------------------------------------------------
         // Label for date.
         JLabel dateLb = new JLabel("Date:");
         // Adjust font and color.
@@ -382,16 +446,16 @@ public class RecordPanel extends ContentPanel {
 
         // ----------------------------------------------------------------------------------------------------
         // Date value.
-        dateValue = new JLabel();
+        recordValues[0] = new JLabel();
         // Adjust font and color.
-        dateValue.setFont(HealthDiary.LB_FONT);
-        dateValue.setForeground(HealthDiary.VALUE_FG_COLOR);
-        dateValue.setBackground(HealthDiary.VALUE_BG_COLOR);
-        dateValue.setOpaque(true);
-        dateValue.setFocusable(false);
-        dateValue.setHorizontalAlignment(JLabel.LEFT);
-        dateValue.setPreferredSize(new Dimension(250, 30));
-        dateValue.setBorder(BorderFactory.createCompoundBorder(
+        recordValues[0].setFont(HealthDiary.LB_FONT);
+        recordValues[0].setForeground(HealthDiary.VALUE_FG_COLOR);
+        recordValues[0].setBackground(HealthDiary.VALUE_BG_COLOR);
+        recordValues[0].setOpaque(true);
+        recordValues[0].setFocusable(false);
+        recordValues[0].setHorizontalAlignment(JLabel.LEFT);
+        recordValues[0].setPreferredSize(new Dimension(250, 30));
+        recordValues[0].setBorder(BorderFactory.createCompoundBorder(
             BorderFactory.createLineBorder(HealthDiary.VALUE_FG_COLOR, 2),
             BorderFactory.createEmptyBorder(0, 5, 0, 5)
         ));
@@ -401,7 +465,7 @@ public class RecordPanel extends ContentPanel {
         gridBagC.gridwidth = GridBagConstraints.REMAINDER;
         gridBagC.gridy = 1;
         gridBagC.gridx = 1;
-        viewEachRecordContent.add(dateValue, gridBagC);
+        viewEachRecordContent.add(recordValues[0], gridBagC);
 
         // ----------------------------------------------------------------------------------------------------
         // Label for body temperature.
@@ -426,16 +490,16 @@ public class RecordPanel extends ContentPanel {
 
         // ----------------------------------------------------------------------------------------------------
         // Body temperature value.
-        bodyTempValue = new JLabel();
+        recordValues[1] = new JLabel();
         // Adjust font and color.
-        bodyTempValue.setFont(HealthDiary.LB_FONT);
-        bodyTempValue.setForeground(HealthDiary.VALUE_FG_COLOR);
-        bodyTempValue.setBackground(HealthDiary.VALUE_BG_COLOR);
-        bodyTempValue.setOpaque(true);
-        bodyTempValue.setFocusable(false);
-        bodyTempValue.setHorizontalAlignment(JLabel.LEFT);
-        bodyTempValue.setPreferredSize(new Dimension(250, 30));
-        bodyTempValue.setBorder(BorderFactory.createCompoundBorder(
+        recordValues[1].setFont(HealthDiary.LB_FONT);
+        recordValues[1].setForeground(HealthDiary.VALUE_FG_COLOR);
+        recordValues[1].setBackground(HealthDiary.VALUE_BG_COLOR);
+        recordValues[1].setOpaque(true);
+        recordValues[1].setFocusable(false);
+        recordValues[1].setHorizontalAlignment(JLabel.LEFT);
+        recordValues[1].setPreferredSize(new Dimension(250, 30));
+        recordValues[1].setBorder(BorderFactory.createCompoundBorder(
             BorderFactory.createLineBorder(HealthDiary.VALUE_FG_COLOR, 2),
             BorderFactory.createEmptyBorder(0, 5, 0, 5)
         ));
@@ -445,7 +509,7 @@ public class RecordPanel extends ContentPanel {
         gridBagC.gridwidth = GridBagConstraints.REMAINDER;
         gridBagC.gridy = 2;
         gridBagC.gridx = 1;
-        viewEachRecordContent.add(bodyTempValue, gridBagC);
+        viewEachRecordContent.add(recordValues[1], gridBagC);
 
         // ----------------------------------------------------------------------------------------------------
         // Label for height.
@@ -470,16 +534,16 @@ public class RecordPanel extends ContentPanel {
 
         // ----------------------------------------------------------------------------------------------------
         // Height value.
-        heightValue = new JLabel();
+        recordValues[2] = new JLabel();
         // Adjust font and color.
-        heightValue.setFont(HealthDiary.LB_FONT);
-        heightValue.setForeground(HealthDiary.VALUE_FG_COLOR);
-        heightValue.setBackground(HealthDiary.VALUE_BG_COLOR);
-        heightValue.setOpaque(true);
-        heightValue.setFocusable(false);
-        heightValue.setHorizontalAlignment(JLabel.LEFT);
-        heightValue.setPreferredSize(new Dimension(250, 30));
-        heightValue.setBorder(BorderFactory.createCompoundBorder(
+        recordValues[2].setFont(HealthDiary.LB_FONT);
+        recordValues[2].setForeground(HealthDiary.VALUE_FG_COLOR);
+        recordValues[2].setBackground(HealthDiary.VALUE_BG_COLOR);
+        recordValues[2].setOpaque(true);
+        recordValues[2].setFocusable(false);
+        recordValues[2].setHorizontalAlignment(JLabel.LEFT);
+        recordValues[2].setPreferredSize(new Dimension(250, 30));
+        recordValues[2].setBorder(BorderFactory.createCompoundBorder(
             BorderFactory.createLineBorder(HealthDiary.VALUE_FG_COLOR, 2),
             BorderFactory.createEmptyBorder(0, 5, 0, 5)
         ));
@@ -489,7 +553,7 @@ public class RecordPanel extends ContentPanel {
         gridBagC.gridwidth = GridBagConstraints.REMAINDER;
         gridBagC.gridy = 3;
         gridBagC.gridx = 1;
-        viewEachRecordContent.add(heightValue, gridBagC);
+        viewEachRecordContent.add(recordValues[2], gridBagC);
 
         // ----------------------------------------------------------------------------------------------------
         // Label for weight.
@@ -514,16 +578,16 @@ public class RecordPanel extends ContentPanel {
 
         // ----------------------------------------------------------------------------------------------------
         // Weight value.
-        weightValue = new JLabel();
+        recordValues[3] = new JLabel();
         // Adjust font and color.
-        weightValue.setFont(HealthDiary.LB_FONT);
-        weightValue.setForeground(HealthDiary.VALUE_FG_COLOR);
-        weightValue.setBackground(HealthDiary.VALUE_BG_COLOR);
-        weightValue.setOpaque(true);
-        weightValue.setFocusable(false);
-        weightValue.setHorizontalAlignment(JLabel.LEFT);
-        weightValue.setPreferredSize(new Dimension(250, 30));
-        weightValue.setBorder(BorderFactory.createCompoundBorder(
+        recordValues[3].setFont(HealthDiary.LB_FONT);
+        recordValues[3].setForeground(HealthDiary.VALUE_FG_COLOR);
+        recordValues[3].setBackground(HealthDiary.VALUE_BG_COLOR);
+        recordValues[3].setOpaque(true);
+        recordValues[3].setFocusable(false);
+        recordValues[3].setHorizontalAlignment(JLabel.LEFT);
+        recordValues[3].setPreferredSize(new Dimension(250, 30));
+        recordValues[3].setBorder(BorderFactory.createCompoundBorder(
             BorderFactory.createLineBorder(HealthDiary.VALUE_FG_COLOR, 2),
             BorderFactory.createEmptyBorder(0, 5, 0, 5)
         ));
@@ -533,7 +597,7 @@ public class RecordPanel extends ContentPanel {
         gridBagC.gridwidth = GridBagConstraints.REMAINDER;
         gridBagC.gridy = 4;
         gridBagC.gridx = 1;
-        viewEachRecordContent.add(weightValue, gridBagC);
+        viewEachRecordContent.add(recordValues[3], gridBagC);
 
         // ----------------------------------------------------------------------------------------------------
         // Label for BMI.
@@ -558,16 +622,16 @@ public class RecordPanel extends ContentPanel {
 
         // ----------------------------------------------------------------------------------------------------
         // BMI value.
-        bmiValue = new JLabel();
+        recordValues[4] = new JLabel();
         // Adjust font and color.
-        bmiValue.setFont(HealthDiary.LB_FONT);
-        bmiValue.setForeground(HealthDiary.VALUE_FG_COLOR);
-        bmiValue.setBackground(HealthDiary.VALUE_BG_COLOR);
-        bmiValue.setOpaque(true);
-        bmiValue.setFocusable(false);
-        bmiValue.setHorizontalAlignment(JLabel.LEFT);
-        bmiValue.setPreferredSize(new Dimension(250, 30));
-        bmiValue.setBorder(BorderFactory.createCompoundBorder(
+        recordValues[4].setFont(HealthDiary.LB_FONT);
+        recordValues[4].setForeground(HealthDiary.VALUE_FG_COLOR);
+        recordValues[4].setBackground(HealthDiary.VALUE_BG_COLOR);
+        recordValues[4].setOpaque(true);
+        recordValues[4].setFocusable(false);
+        recordValues[4].setHorizontalAlignment(JLabel.LEFT);
+        recordValues[4].setPreferredSize(new Dimension(250, 30));
+        recordValues[4].setBorder(BorderFactory.createCompoundBorder(
             BorderFactory.createLineBorder(HealthDiary.VALUE_FG_COLOR, 2),
             BorderFactory.createEmptyBorder(0, 5, 0, 5)
         ));
@@ -577,7 +641,7 @@ public class RecordPanel extends ContentPanel {
         gridBagC.gridwidth = GridBagConstraints.REMAINDER;
         gridBagC.gridy = 5;
         gridBagC.gridx = 1;
-        viewEachRecordContent.add(bmiValue, gridBagC);
+        viewEachRecordContent.add(recordValues[4], gridBagC);
 
         // ----------------------------------------------------------------------------------------------------
         // Label for status.
@@ -602,16 +666,16 @@ public class RecordPanel extends ContentPanel {
 
         // ----------------------------------------------------------------------------------------------------
         // Status value.
-        statusValue = new JLabel();
+        recordValues[5] = new JLabel();
         // Adjust font and color.
-        statusValue.setFont(HealthDiary.LB_FONT);
-        statusValue.setForeground(HealthDiary.VALUE_FG_COLOR);
-        statusValue.setBackground(HealthDiary.VALUE_BG_COLOR);
-        statusValue.setOpaque(true);
-        statusValue.setFocusable(false);
-        statusValue.setHorizontalAlignment(JLabel.LEFT);
-        statusValue.setPreferredSize(new Dimension(250, 30));
-        statusValue.setBorder(BorderFactory.createCompoundBorder(
+        recordValues[5].setFont(HealthDiary.LB_FONT);
+        recordValues[5].setForeground(HealthDiary.VALUE_FG_COLOR);
+        recordValues[5].setBackground(HealthDiary.VALUE_BG_COLOR);
+        recordValues[5].setOpaque(true);
+        recordValues[5].setFocusable(false);
+        recordValues[5].setHorizontalAlignment(JLabel.LEFT);
+        recordValues[5].setPreferredSize(new Dimension(250, 30));
+        recordValues[5].setBorder(BorderFactory.createCompoundBorder(
             BorderFactory.createLineBorder(HealthDiary.VALUE_FG_COLOR, 2),
             BorderFactory.createEmptyBorder(0, 5, 0, 5)
         ));
@@ -621,7 +685,7 @@ public class RecordPanel extends ContentPanel {
         gridBagC.gridwidth = GridBagConstraints.REMAINDER;
         gridBagC.gridy = 6;
         gridBagC.gridx = 1;
-        viewEachRecordContent.add(statusValue, gridBagC);
+        viewEachRecordContent.add(recordValues[5], gridBagC);
 
         // ----------------------------------------------------------------------------------------------------
         // Label for health advice.
@@ -756,6 +820,476 @@ public class RecordPanel extends ContentPanel {
 
     // Add Add Record Page.
     private void addAddRecord() {
+        addRecord = new ContentPage(this, "Add Record", 3);
+        addRecord.setLayout(new BorderLayout());
+
+        // ----------------------------------------------------------------------------------------------------
+        // Button for redirecting to View Each Record Page.
+        JButton toViewAllPageBtn = new JButton(HealthDiary.UNI_RETURN_ARROW + " Back");
+        // Adjust font and color.
+        toViewAllPageBtn.setFont(HealthDiary.SMALL_BTN_FONT);
+        toViewAllPageBtn.setForeground(HealthDiary.BTN_FG_COLOR);
+        toViewAllPageBtn.setBackground(HealthDiary.BTN_BG_COLOR);
+        // Adjust action.
+        toViewAllPageBtn.setActionCommand("View All Record");
+        toViewAllPageBtn.addActionListener(addRecord);
+        toViewAllPageBtn.setFocusable(false);
+        // Add to Content Page.
+        addRecord.add(toViewAllPageBtn, BorderLayout.NORTH);
+
+        // ----------------------------------------------------------------------------------------------------
+        // For main content of Add Record (i.e., all input fields and options).
+        JPanel addRecordContent = new JPanel(new GridBagLayout());
+        // No reuse, new object for each component.
+        GridBagConstraints gridBagC;
+        addRecordContent.setBackground(HealthDiary.THEME_BG_COLOR);
+
+        // ----------------------------------------------------------------------------------------------------
+        // Heading for Add Record content.
+        JLabel addRecordHeading = new JLabel("Add Record");
+        // Adjust font and color.
+        addRecordHeading.setFont(HealthDiary.MAIN_FONT);
+        addRecordHeading.setForeground(HealthDiary.TEXT_COLOR);
+        addRecordHeading.setHorizontalAlignment(JLabel.CENTER);
+        // Add icon to heading.
+        addRecordHeading.setIcon(new ImageIcon(
+            HealthDiary.ADD_RECORD_ICON.getImage().getScaledInstance(
+                64, 64, java.awt.Image.SCALE_SMOOTH
+            )
+        ));
+        // Add to content.
+        gridBagC = new GridBagConstraints();
+        gridBagC.insets = new InsetsUIResource(10, 5, 5, 5);
+        gridBagC.gridwidth = GridBagConstraints.REMAINDER;
+        gridBagC.gridy = 0;
+        gridBagC.gridx = 0;
+        gridBagC.fill = GridBagConstraints.HORIZONTAL;
+        addRecordContent.add(addRecordHeading, gridBagC);
+
+        // ----------------------------------------------------------------------------------------------------
+        // Array of data input and message.
+        addInputs = new JTextField[4];
+        addMsgs = new JLabel[4];
+
+        // ----------------------------------------------------------------------------------------------------
+        // Label for date.
+        JLabel dateLb = new JLabel("Date (e.g., 01/06/2022 12:00 pm):");
+        // Adjust font and color.
+        dateLb.setFont(HealthDiary.BTN_FONT);
+        dateLb.setForeground(HealthDiary.TEXT_COLOR);
+        dateLb.setHorizontalAlignment(JLabel.LEFT);
+        dateLb.setMinimumSize(new Dimension(200, 30));
+        dateLb.setBorder(BorderFactory.createEmptyBorder(0, 5, 0, 5));
+        // Add to content.
+        gridBagC = new GridBagConstraints();
+        gridBagC.insets = new InsetsUIResource(5, 5, 2, 5);
+        gridBagC.gridwidth = GridBagConstraints.REMAINDER;
+        gridBagC.gridy = 1;
+        gridBagC.gridx = 0;
+        gridBagC.fill = GridBagConstraints.HORIZONTAL;
+        addRecordContent.add(dateLb, gridBagC);
+
+        // ----------------------------------------------------------------------------------------------------
+        // Date input.
+        addInputs[0] = new JTextField();
+        // Adjust font and color.
+        addInputs[0].setFont(HealthDiary.LB_FONT);
+        addInputs[0].setForeground(HealthDiary.VALUE_FG_COLOR);
+        addInputs[0].setHorizontalAlignment(JLabel.LEFT);
+        addInputs[0].setPreferredSize(new Dimension(300, 30));
+        addInputs[0].setBorder(BorderFactory.createCompoundBorder(
+            BorderFactory.createLineBorder(HealthDiary.VALUE_FG_COLOR, 2),
+            BorderFactory.createEmptyBorder(2, 5, 2, 5)
+        ));
+        // Add to content.
+        gridBagC = new GridBagConstraints();
+        gridBagC.insets = new InsetsUIResource(0, 5, 1, 5);
+        gridBagC.gridwidth = GridBagConstraints.REMAINDER;
+        gridBagC.gridy = 2;
+        gridBagC.gridx = 0;
+        gridBagC.fill = GridBagConstraints.HORIZONTAL;
+        addRecordContent.add(addInputs[0], gridBagC);
+
+        // ----------------------------------------------------------------------------------------------------
+        // Label for date error.
+        addMsgs[0] = new JLabel();
+        // Adjust font and color.
+        addMsgs[0].setFont(HealthDiary.LB_FONT);
+        addMsgs[0].setForeground(HealthDiary.NEGATIVE_COLOR);
+        addMsgs[0].setBackground(HealthDiary.VALUE_BG_COLOR);
+        addMsgs[0].setOpaque(true);
+        addMsgs[0].setHorizontalAlignment(JLabel.CENTER);
+        addMsgs[0].setMinimumSize(new Dimension(250, 30));
+        addMsgs[0].setBorder(BorderFactory.createEmptyBorder(0, 5, 0, 5));
+        // Add to content.
+        gridBagC = new GridBagConstraints();
+        gridBagC.insets = new InsetsUIResource(1, 5, 5, 5);
+        gridBagC.gridwidth = GridBagConstraints.REMAINDER;
+        gridBagC.gridy = 3;
+        gridBagC.gridx = 0;
+        gridBagC.fill = GridBagConstraints.HORIZONTAL;
+        addRecordContent.add(addMsgs[0], gridBagC);
+        // Set input verifier.
+        addInputs[0].setInputVerifier(new InputVerifier() {
+            @Override
+            public boolean verify(JComponent input) {
+                ((JTextField) input).setText(((JTextField) input).getText().strip());
+                // Valid datetime.
+                if (validateDateTime(((JTextField) input).getText())) {
+                    addMsgs[0].setText("");
+                    input.setBorder(BorderFactory.createCompoundBorder(
+                        BorderFactory.createLineBorder(HealthDiary.VALUE_FG_COLOR, 2),
+                        BorderFactory.createEmptyBorder(0, 5, 0, 5)
+                    ));
+                    return true;
+                }
+                // Invalid datetime.
+                else {
+                    addMsgs[0].setText("* Follow format: dd/MM/yyyy hh:mm aa *");
+                    input.setBorder(BorderFactory.createCompoundBorder(
+                        BorderFactory.createLineBorder(HealthDiary.NEGATIVE_COLOR, 2),
+                        BorderFactory.createEmptyBorder(0, 5, 0, 5)
+                    ));
+                    return false;
+                }
+            }
+        });
+
+        // ----------------------------------------------------------------------------------------------------
+        // Label for body temperature.
+        JLabel bTempLb = new JLabel("Body Temperature (in " + HealthDiary.UNI_CELSIUS + "):");
+        // Adjust font and color.
+        bTempLb.setFont(HealthDiary.BTN_FONT);
+        bTempLb.setForeground(HealthDiary.TEXT_COLOR);
+        bTempLb.setHorizontalAlignment(JLabel.LEFT);
+        bTempLb.setMinimumSize(new Dimension(200, 30));
+        bTempLb.setBorder(BorderFactory.createEmptyBorder(0, 5, 0, 5));
+        // Add to content.
+        gridBagC = new GridBagConstraints();
+        gridBagC.insets = new InsetsUIResource(5, 5, 2, 5);
+        gridBagC.gridwidth = GridBagConstraints.REMAINDER;
+        gridBagC.gridy = 4;
+        gridBagC.gridx = 0;
+        gridBagC.fill = GridBagConstraints.HORIZONTAL;
+        addRecordContent.add(bTempLb, gridBagC);
+
+        // ----------------------------------------------------------------------------------------------------
+        // Body temperature input.
+        addInputs[1] = new JTextField();
+        // Adjust font and color.
+        addInputs[1].setFont(HealthDiary.LB_FONT);
+        addInputs[1].setForeground(HealthDiary.VALUE_FG_COLOR);
+        addInputs[1].setHorizontalAlignment(JLabel.LEFT);
+        addInputs[1].setPreferredSize(new Dimension(300, 30));
+        addInputs[1].setBorder(BorderFactory.createCompoundBorder(
+            BorderFactory.createLineBorder(HealthDiary.VALUE_FG_COLOR, 2),
+            BorderFactory.createEmptyBorder(2, 5, 2, 5)
+        ));
+        // Add to content.
+        gridBagC = new GridBagConstraints();
+        gridBagC.insets = new InsetsUIResource(0, 5, 1, 5);
+        gridBagC.gridwidth = GridBagConstraints.REMAINDER;
+        gridBagC.gridy = 5;
+        gridBagC.gridx = 0;
+        gridBagC.fill = GridBagConstraints.HORIZONTAL;
+        addRecordContent.add(addInputs[1], gridBagC);
+
+        // ----------------------------------------------------------------------------------------------------
+        // Label for body temperature error.
+        addMsgs[1] = new JLabel();
+        // Adjust font and color.
+        addMsgs[1].setFont(HealthDiary.LB_FONT);
+        addMsgs[1].setForeground(HealthDiary.NEGATIVE_COLOR);
+        addMsgs[1].setBackground(HealthDiary.VALUE_BG_COLOR);
+        addMsgs[1].setOpaque(true);
+        addMsgs[1].setHorizontalAlignment(JLabel.CENTER);
+        addMsgs[1].setMinimumSize(new Dimension(250, 30));
+        addMsgs[1].setBorder(BorderFactory.createEmptyBorder(0, 5, 0, 5));
+        // Add to content.
+        gridBagC = new GridBagConstraints();
+        gridBagC.insets = new InsetsUIResource(1, 5, 5, 5);
+        gridBagC.gridwidth = GridBagConstraints.REMAINDER;
+        gridBagC.gridy = 6;
+        gridBagC.gridx = 0;
+        gridBagC.fill = GridBagConstraints.HORIZONTAL;
+        addRecordContent.add(addMsgs[1], gridBagC);
+        // Set input verifier.
+        addInputs[1].setInputVerifier(new InputVerifier() {
+            @Override
+            public boolean verify(JComponent input) {
+                ((JTextField) input).setText(((JTextField) input).getText().strip());
+                // Valid body temperature.
+                if (validateBodyTemp(((JTextField) input).getText())) {
+                    addMsgs[1].setText("");
+                    input.setBorder(BorderFactory.createCompoundBorder(
+                        BorderFactory.createLineBorder(HealthDiary.VALUE_FG_COLOR, 2),
+                        BorderFactory.createEmptyBorder(0, 5, 0, 5)
+                    ));
+                    return true;
+                }
+                // Invalid body temperature.
+                else {
+                    addMsgs[1].setText("* Valid temperature: 25.0 < x < 50.0 *");
+                    input.setBorder(BorderFactory.createCompoundBorder(
+                        BorderFactory.createLineBorder(HealthDiary.NEGATIVE_COLOR, 2),
+                        BorderFactory.createEmptyBorder(0, 5, 0, 5)
+                    ));
+                    return false;
+                }
+            }
+        });
+
+        // ----------------------------------------------------------------------------------------------------
+        // Label for height.
+        JLabel heightLb = new JLabel("Height (in cm):");
+        // Adjust font and color.
+        heightLb.setFont(HealthDiary.BTN_FONT);
+        heightLb.setForeground(HealthDiary.TEXT_COLOR);
+        heightLb.setHorizontalAlignment(JLabel.LEFT);
+        heightLb.setMinimumSize(new Dimension(200, 30));
+        heightLb.setBorder(BorderFactory.createEmptyBorder(0, 5, 0, 5));
+        // Add to content.
+        gridBagC = new GridBagConstraints();
+        gridBagC.insets = new InsetsUIResource(5, 5, 2, 5);
+        gridBagC.gridwidth = GridBagConstraints.REMAINDER;
+        gridBagC.gridy = 7;
+        gridBagC.gridx = 0;
+        gridBagC.fill = GridBagConstraints.HORIZONTAL;
+        addRecordContent.add(heightLb, gridBagC);
+
+        // ----------------------------------------------------------------------------------------------------
+        // Height input.
+        addInputs[2] = new JTextField();
+        // Adjust font and color.
+        addInputs[2].setFont(HealthDiary.LB_FONT);
+        addInputs[2].setForeground(HealthDiary.VALUE_FG_COLOR);
+        addInputs[2].setHorizontalAlignment(JLabel.LEFT);
+        addInputs[2].setPreferredSize(new Dimension(300, 30));
+        addInputs[2].setBorder(BorderFactory.createCompoundBorder(
+            BorderFactory.createLineBorder(HealthDiary.VALUE_FG_COLOR, 2),
+            BorderFactory.createEmptyBorder(2, 5, 2, 5)
+        ));
+        // Add to content.
+        gridBagC = new GridBagConstraints();
+        gridBagC.insets = new InsetsUIResource(0, 5, 1, 5);
+        gridBagC.gridwidth = GridBagConstraints.REMAINDER;
+        gridBagC.gridy = 8;
+        gridBagC.gridx = 0;
+        gridBagC.fill = GridBagConstraints.HORIZONTAL;
+        addRecordContent.add(addInputs[2], gridBagC);
+
+        // ----------------------------------------------------------------------------------------------------
+        // Label for height error.
+        addMsgs[2] = new JLabel();
+        // Adjust font and color.
+        addMsgs[2].setFont(HealthDiary.LB_FONT);
+        addMsgs[2].setForeground(HealthDiary.NEGATIVE_COLOR);
+        addMsgs[2].setBackground(HealthDiary.VALUE_BG_COLOR);
+        addMsgs[2].setOpaque(true);
+        addMsgs[2].setHorizontalAlignment(JLabel.CENTER);
+        addMsgs[2].setMinimumSize(new Dimension(250, 30));
+        addMsgs[2].setBorder(BorderFactory.createEmptyBorder(0, 5, 0, 5));
+        // Add to content.
+        gridBagC = new GridBagConstraints();
+        gridBagC.insets = new InsetsUIResource(1, 5, 5, 5);
+        gridBagC.gridwidth = GridBagConstraints.REMAINDER;
+        gridBagC.gridy = 9;
+        gridBagC.gridx = 0;
+        gridBagC.fill = GridBagConstraints.HORIZONTAL;
+        addRecordContent.add(addMsgs[2], gridBagC);
+        // Set input verifier.
+        addInputs[2].setInputVerifier(new InputVerifier() {
+            @Override
+            public boolean verify(JComponent input) {
+                ((JTextField) input).setText(((JTextField) input).getText().strip());
+                // Valid height.
+                if (validateHeight(((JTextField) input).getText())) {
+                    addMsgs[2].setText("");
+                    input.setBorder(BorderFactory.createCompoundBorder(
+                        BorderFactory.createLineBorder(HealthDiary.VALUE_FG_COLOR, 2),
+                        BorderFactory.createEmptyBorder(0, 5, 0, 5)
+                    ));
+                    return true;
+                }
+                // Invalid height.
+                else {
+                    addMsgs[2].setText("* Valid height: 50.0 < x < 250.0 *");
+                    input.setBorder(BorderFactory.createCompoundBorder(
+                        BorderFactory.createLineBorder(HealthDiary.NEGATIVE_COLOR, 2),
+                        BorderFactory.createEmptyBorder(0, 5, 0, 5)
+                    ));
+                    return false;
+                }
+            }
+        });
+
+        // ----------------------------------------------------------------------------------------------------
+        // Label for weight.
+        JLabel weightLb = new JLabel("Weight (in kg):");
+        // Adjust font and color.
+        weightLb.setFont(HealthDiary.BTN_FONT);
+        weightLb.setForeground(HealthDiary.TEXT_COLOR);
+        weightLb.setHorizontalAlignment(JLabel.LEFT);
+        weightLb.setMinimumSize(new Dimension(200, 30));
+        weightLb.setBorder(BorderFactory.createEmptyBorder(0, 5, 0, 5));
+        // Add to content.
+        gridBagC = new GridBagConstraints();
+        gridBagC.insets = new InsetsUIResource(5, 5, 2, 5);
+        gridBagC.gridwidth = GridBagConstraints.REMAINDER;
+        gridBagC.gridy = 10;
+        gridBagC.gridx = 0;
+        gridBagC.fill = GridBagConstraints.HORIZONTAL;
+        addRecordContent.add(weightLb, gridBagC);
+
+        // ----------------------------------------------------------------------------------------------------
+        // Weight input.
+        addInputs[3] = new JTextField();
+        // Adjust font and color.
+        addInputs[3].setFont(HealthDiary.LB_FONT);
+        addInputs[3].setForeground(HealthDiary.VALUE_FG_COLOR);
+        addInputs[3].setHorizontalAlignment(JLabel.LEFT);
+        addInputs[3].setPreferredSize(new Dimension(300, 30));
+        addInputs[3].setBorder(BorderFactory.createCompoundBorder(
+            BorderFactory.createLineBorder(HealthDiary.VALUE_FG_COLOR, 2),
+            BorderFactory.createEmptyBorder(2, 5, 2, 5)
+        ));
+        // Add to content.
+        gridBagC = new GridBagConstraints();
+        gridBagC.insets = new InsetsUIResource(0, 5, 1, 5);
+        gridBagC.gridwidth = GridBagConstraints.REMAINDER;
+        gridBagC.gridy = 11;
+        gridBagC.gridx = 0;
+        gridBagC.fill = GridBagConstraints.HORIZONTAL;
+        addRecordContent.add(addInputs[3], gridBagC);
+
+        // ----------------------------------------------------------------------------------------------------
+        // Label for weight error.
+        addMsgs[3] = new JLabel();
+        // Adjust font and color.
+        addMsgs[3].setFont(HealthDiary.LB_FONT);
+        addMsgs[3].setForeground(HealthDiary.NEGATIVE_COLOR);
+        addMsgs[3].setBackground(HealthDiary.VALUE_BG_COLOR);
+        addMsgs[3].setOpaque(true);
+        addMsgs[3].setHorizontalAlignment(JLabel.CENTER);
+        addMsgs[3].setMinimumSize(new Dimension(250, 30));
+        addMsgs[3].setBorder(BorderFactory.createEmptyBorder(0, 5, 0, 5));
+        // Add to content.
+        gridBagC = new GridBagConstraints();
+        gridBagC.insets = new InsetsUIResource(1, 5, 5, 5);
+        gridBagC.gridwidth = GridBagConstraints.REMAINDER;
+        gridBagC.gridy = 12;
+        gridBagC.gridx = 0;
+        gridBagC.fill = GridBagConstraints.HORIZONTAL;
+        addRecordContent.add(addMsgs[3], gridBagC);
+        // Set input verifier.
+        addInputs[3].setInputVerifier(new InputVerifier() {
+            @Override
+            public boolean verify(JComponent input) {
+                ((JTextField) input).setText(((JTextField) input).getText().strip());
+                // Valid weight.
+                if (validateWeight(((JTextField) input).getText())) {
+                    addMsgs[3].setText("");
+                    input.setBorder(BorderFactory.createCompoundBorder(
+                        BorderFactory.createLineBorder(HealthDiary.VALUE_FG_COLOR, 2),
+                        BorderFactory.createEmptyBorder(0, 5, 0, 5)
+                    ));
+                    return true;
+                }
+                // Invalid weight.
+                else {
+                    addMsgs[3].setText("* Valid weight: 5.0 < x < 500.0 *");
+                    input.setBorder(BorderFactory.createCompoundBorder(
+                        BorderFactory.createLineBorder(HealthDiary.NEGATIVE_COLOR, 2),
+                        BorderFactory.createEmptyBorder(0, 5, 0, 5)
+                    ));
+                    return false;
+                }
+            }
+        });
+
+        // ----------------------------------------------------------------------------------------------------
+        // Modified ActionListener for saving new record.
+        ActionListener saveAdd = new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (!addRecordInList()) {
+                    return;
+                }
+                
+                writeRecordFile(true);
+                // Set current index to the last index.
+                recordIndex = allRecord.size() - 1;
+                refreshEachRecordPage();
+
+                // Check index after refresh View All Record Page.
+                HealthRecord tempRecord = allRecord.get(recordIndex);
+                refreshAllRecordPage();
+                recordIndex = allRecord.indexOf(tempRecord);
+
+                addRecord.actionPerformed(e);
+                return;
+            }
+        };
+
+        // ----------------------------------------------------------------------------------------------------
+        // Button for save record adding.
+        JButton saveAddBtn = new JButton("Add Now");
+        // Adjust font and color.
+        saveAddBtn.setFont(HealthDiary.BTN_FONT);
+        saveAddBtn.setForeground(HealthDiary.BTN_FG_COLOR);
+        saveAddBtn.setBackground(HealthDiary.POSITIVE_COLOR);
+        // Adjust action.
+        saveAddBtn.setActionCommand("View Each Record");
+        saveAddBtn.addActionListener(saveAdd);
+        saveAddBtn.setFocusable(false);
+        saveAddBtn.setBorder(BorderFactory.createCompoundBorder(
+            BorderFactory.createLineBorder(HealthDiary.BTN_FG_COLOR, 3, true),
+            BorderFactory.createEmptyBorder(10, 25, 10, 25)
+        ));
+        saveAddBtn.setMinimumSize(new Dimension(100, 50));
+
+        // ----------------------------------------------------------------------------------------------------
+        // Button for cancel record adding.
+        JButton cancelAddBtn = new JButton("Cancel Add");
+        // Adjust font and color.
+        cancelAddBtn.setFont(HealthDiary.BTN_FONT);
+        cancelAddBtn.setForeground(HealthDiary.BTN_FG_COLOR);
+        cancelAddBtn.setBackground(HealthDiary.NEGATIVE_COLOR);
+        // Adjust action.
+        cancelAddBtn.setActionCommand("View All Record");
+        cancelAddBtn.addActionListener(addRecord);
+        cancelAddBtn.setFocusable(false);
+        cancelAddBtn.setBorder(BorderFactory.createCompoundBorder(
+            BorderFactory.createLineBorder(HealthDiary.BTN_FG_COLOR, 3, true),
+            BorderFactory.createEmptyBorder(10, 25, 10, 25)
+        ));
+        cancelAddBtn.setMinimumSize(new Dimension(100, 50));
+
+        // ----------------------------------------------------------------------------------------------------
+        // Panel for save and cancel buttons.
+        JPanel saveCancelPanel = new JPanel();
+        saveCancelPanel.setBackground(HealthDiary.THEME_BG_COLOR);
+        saveCancelPanel.setBorder(BorderFactory.createEmptyBorder(5, 15, 5, 15));
+        // Set layout.
+        GridLayout saveCancelLayout = new GridLayout();
+        saveCancelLayout.setHgap(15);
+        saveCancelPanel.setLayout(saveCancelLayout);
+        // Add button.
+        saveCancelPanel.add(saveAddBtn);
+        saveCancelPanel.add(cancelAddBtn);
+        // Add to content.
+        gridBagC = new GridBagConstraints();
+        gridBagC.insets = new InsetsUIResource(5, 5, 10, 5);
+        gridBagC.gridwidth = GridBagConstraints.REMAINDER;
+        gridBagC.gridy = 13;
+        gridBagC.gridx = 0;
+        gridBagC.fill = GridBagConstraints.HORIZONTAL;
+        addRecordContent.add(saveCancelPanel, gridBagC);
+
+        // ----------------------------------------------------------------------------------------------------
+        // Add content to Content Page.
+        addRecord.add(addRecordContent, BorderLayout.CENTER);
+        addPage(addRecord);
         return;
     }
 
@@ -808,42 +1342,422 @@ public class RecordPanel extends ContentPanel {
         editRecordContent.add(editRecordHeading, gridBagC);
 
         // ----------------------------------------------------------------------------------------------------
+        // Array of data input and message.
+        editInputs = new JTextField[4];
+        editMsgs = new JLabel[4];
+
+        // ----------------------------------------------------------------------------------------------------
         // Label for date.
-        JLabel dateLb = new JLabel("Date:");
+        JLabel dateLb = new JLabel("Date (e.g., 01/06/2022 12:00 pm):");
         // Adjust font and color.
         dateLb.setFont(HealthDiary.BTN_FONT);
         dateLb.setForeground(HealthDiary.TEXT_COLOR);
         dateLb.setHorizontalAlignment(JLabel.LEFT);
-        dateLb.setPreferredSize(new Dimension(200, 30));
+        dateLb.setMinimumSize(new Dimension(200, 30));
         dateLb.setBorder(BorderFactory.createEmptyBorder(0, 5, 0, 5));
         // Add to content.
         gridBagC = new GridBagConstraints();
-        gridBagC.insets = new InsetsUIResource(5, 5, 5, 5);
+        gridBagC.insets = new InsetsUIResource(5, 5, 2, 5);
         gridBagC.gridwidth = GridBagConstraints.REMAINDER;
-        gridBagC.gridy = 4;
+        gridBagC.gridy = 1;
         gridBagC.gridx = 0;
         gridBagC.fill = GridBagConstraints.HORIZONTAL;
         editRecordContent.add(dateLb, gridBagC);
 
-        // // ----------------------------------------------------------------------------------------------------
-        // // Blood type input (Combo Box).
-        // bloodComboBox = new JComboBox<String>(UserProfile.ALL_BLOOD_TYPE);
-        // // Adjust font and color.
-        // bloodComboBox.setFont(HealthDiary.BTN_FONT);
-        // bloodComboBox.setForeground(HealthDiary.VALUE_FG_COLOR);
-        // // bloodComboBox.setBackground(HealthDiary.VALUE_BG_COLOR);
-        // // Add border.
-        // bloodComboBox.setBorder(BorderFactory.createLineBorder(HealthDiary.VALUE_FG_COLOR, 2));
-        // bloodComboBox.setMinimumSize(new Dimension(100, 30));
-        // bloodComboBox.setFocusable(false);
-        // bloodComboBox.setEditable(false);
-        // // Add to content.
-        // gridBagC = new GridBagConstraints();
-        // gridBagC.insets = new InsetsUIResource(5, 5, 5, 5);
-        // gridBagC.gridy = 4;
-        // gridBagC.gridx = 1;
-        // gridBagC.fill = GridBagConstraints.HORIZONTAL;
-        // editProfileContent.add(bloodComboBox, gridBagC);
+        // ----------------------------------------------------------------------------------------------------
+        // Date input.
+        editInputs[0] = new JTextField();
+        // Adjust font and color.
+        editInputs[0].setFont(HealthDiary.LB_FONT);
+        editInputs[0].setForeground(HealthDiary.VALUE_FG_COLOR);
+        editInputs[0].setHorizontalAlignment(JLabel.LEFT);
+        editInputs[0].setPreferredSize(new Dimension(300, 30));
+        editInputs[0].setBorder(BorderFactory.createCompoundBorder(
+            BorderFactory.createLineBorder(HealthDiary.VALUE_FG_COLOR, 2),
+            BorderFactory.createEmptyBorder(2, 5, 2, 5)
+        ));
+        // Add to content.
+        gridBagC = new GridBagConstraints();
+        gridBagC.insets = new InsetsUIResource(0, 5, 1, 5);
+        gridBagC.gridwidth = GridBagConstraints.REMAINDER;
+        gridBagC.gridy = 2;
+        gridBagC.gridx = 0;
+        gridBagC.fill = GridBagConstraints.HORIZONTAL;
+        editRecordContent.add(editInputs[0], gridBagC);
+
+        // ----------------------------------------------------------------------------------------------------
+        // Label for date error.
+        editMsgs[0] = new JLabel();
+        // Adjust font and color.
+        editMsgs[0].setFont(HealthDiary.LB_FONT);
+        editMsgs[0].setForeground(HealthDiary.NEGATIVE_COLOR);
+        editMsgs[0].setBackground(HealthDiary.VALUE_BG_COLOR);
+        editMsgs[0].setOpaque(true);
+        editMsgs[0].setHorizontalAlignment(JLabel.CENTER);
+        editMsgs[0].setMinimumSize(new Dimension(250, 30));
+        editMsgs[0].setBorder(BorderFactory.createEmptyBorder(0, 5, 0, 5));
+        // Add to content.
+        gridBagC = new GridBagConstraints();
+        gridBagC.insets = new InsetsUIResource(1, 5, 5, 5);
+        gridBagC.gridwidth = GridBagConstraints.REMAINDER;
+        gridBagC.gridy = 3;
+        gridBagC.gridx = 0;
+        gridBagC.fill = GridBagConstraints.HORIZONTAL;
+        editRecordContent.add(editMsgs[0], gridBagC);
+        // Set input verifier.
+        editInputs[0].setInputVerifier(new InputVerifier() {
+            @Override
+            public boolean verify(JComponent input) {
+                ((JTextField) input).setText(((JTextField) input).getText().strip());
+                // Valid datetime.
+                if (validateDateTime(((JTextField) input).getText())) {
+                    editMsgs[0].setText("");
+                    input.setBorder(BorderFactory.createCompoundBorder(
+                        BorderFactory.createLineBorder(HealthDiary.VALUE_FG_COLOR, 2),
+                        BorderFactory.createEmptyBorder(0, 5, 0, 5)
+                    ));
+                    return true;
+                }
+                // Invalid datetime.
+                else {
+                    editMsgs[0].setText("* Follow format: dd/MM/yyyy hh:mm aa *");
+                    input.setBorder(BorderFactory.createCompoundBorder(
+                        BorderFactory.createLineBorder(HealthDiary.NEGATIVE_COLOR, 2),
+                        BorderFactory.createEmptyBorder(0, 5, 0, 5)
+                    ));
+                    return false;
+                }
+            }
+        });
+
+        // ----------------------------------------------------------------------------------------------------
+        // Label for body temperature.
+        JLabel bTempLb = new JLabel("Body Temperature (in " + HealthDiary.UNI_CELSIUS + "):");
+        // Adjust font and color.
+        bTempLb.setFont(HealthDiary.BTN_FONT);
+        bTempLb.setForeground(HealthDiary.TEXT_COLOR);
+        bTempLb.setHorizontalAlignment(JLabel.LEFT);
+        bTempLb.setMinimumSize(new Dimension(200, 30));
+        bTempLb.setBorder(BorderFactory.createEmptyBorder(0, 5, 0, 5));
+        // Add to content.
+        gridBagC = new GridBagConstraints();
+        gridBagC.insets = new InsetsUIResource(5, 5, 2, 5);
+        gridBagC.gridwidth = GridBagConstraints.REMAINDER;
+        gridBagC.gridy = 4;
+        gridBagC.gridx = 0;
+        gridBagC.fill = GridBagConstraints.HORIZONTAL;
+        editRecordContent.add(bTempLb, gridBagC);
+
+        // ----------------------------------------------------------------------------------------------------
+        // Body temperature input.
+        editInputs[1] = new JTextField();
+        // Adjust font and color.
+        editInputs[1].setFont(HealthDiary.LB_FONT);
+        editInputs[1].setForeground(HealthDiary.VALUE_FG_COLOR);
+        editInputs[1].setHorizontalAlignment(JLabel.LEFT);
+        editInputs[1].setPreferredSize(new Dimension(300, 30));
+        editInputs[1].setBorder(BorderFactory.createCompoundBorder(
+            BorderFactory.createLineBorder(HealthDiary.VALUE_FG_COLOR, 2),
+            BorderFactory.createEmptyBorder(2, 5, 2, 5)
+        ));
+        // Add to content.
+        gridBagC = new GridBagConstraints();
+        gridBagC.insets = new InsetsUIResource(0, 5, 1, 5);
+        gridBagC.gridwidth = GridBagConstraints.REMAINDER;
+        gridBagC.gridy = 5;
+        gridBagC.gridx = 0;
+        gridBagC.fill = GridBagConstraints.HORIZONTAL;
+        editRecordContent.add(editInputs[1], gridBagC);
+
+        // ----------------------------------------------------------------------------------------------------
+        // Label for body temperature error.
+        editMsgs[1] = new JLabel();
+        // Adjust font and color.
+        editMsgs[1].setFont(HealthDiary.LB_FONT);
+        editMsgs[1].setForeground(HealthDiary.NEGATIVE_COLOR);
+        editMsgs[1].setBackground(HealthDiary.VALUE_BG_COLOR);
+        editMsgs[1].setOpaque(true);
+        editMsgs[1].setHorizontalAlignment(JLabel.CENTER);
+        editMsgs[1].setMinimumSize(new Dimension(250, 30));
+        editMsgs[1].setBorder(BorderFactory.createEmptyBorder(0, 5, 0, 5));
+        // Add to content.
+        gridBagC = new GridBagConstraints();
+        gridBagC.insets = new InsetsUIResource(1, 5, 5, 5);
+        gridBagC.gridwidth = GridBagConstraints.REMAINDER;
+        gridBagC.gridy = 6;
+        gridBagC.gridx = 0;
+        gridBagC.fill = GridBagConstraints.HORIZONTAL;
+        editRecordContent.add(editMsgs[1], gridBagC);
+        // Set input verifier.
+        editInputs[1].setInputVerifier(new InputVerifier() {
+            @Override
+            public boolean verify(JComponent input) {
+                ((JTextField) input).setText(((JTextField) input).getText().strip());
+                // Valid body temperature.
+                if (validateBodyTemp(((JTextField) input).getText())) {
+                    editMsgs[1].setText("");
+                    input.setBorder(BorderFactory.createCompoundBorder(
+                        BorderFactory.createLineBorder(HealthDiary.VALUE_FG_COLOR, 2),
+                        BorderFactory.createEmptyBorder(0, 5, 0, 5)
+                    ));
+                    return true;
+                }
+                // Invalid body temperature.
+                else {
+                    editMsgs[1].setText("* Valid temperature: 25.0 < x < 50.0 *");
+                    input.setBorder(BorderFactory.createCompoundBorder(
+                        BorderFactory.createLineBorder(HealthDiary.NEGATIVE_COLOR, 2),
+                        BorderFactory.createEmptyBorder(0, 5, 0, 5)
+                    ));
+                    return false;
+                }
+            }
+        });
+
+        // ----------------------------------------------------------------------------------------------------
+        // Label for height.
+        JLabel heightLb = new JLabel("Height (in cm):");
+        // Adjust font and color.
+        heightLb.setFont(HealthDiary.BTN_FONT);
+        heightLb.setForeground(HealthDiary.TEXT_COLOR);
+        heightLb.setHorizontalAlignment(JLabel.LEFT);
+        heightLb.setMinimumSize(new Dimension(200, 30));
+        heightLb.setBorder(BorderFactory.createEmptyBorder(0, 5, 0, 5));
+        // Add to content.
+        gridBagC = new GridBagConstraints();
+        gridBagC.insets = new InsetsUIResource(5, 5, 2, 5);
+        gridBagC.gridwidth = GridBagConstraints.REMAINDER;
+        gridBagC.gridy = 7;
+        gridBagC.gridx = 0;
+        gridBagC.fill = GridBagConstraints.HORIZONTAL;
+        editRecordContent.add(heightLb, gridBagC);
+
+        // ----------------------------------------------------------------------------------------------------
+        // Height input.
+        editInputs[2] = new JTextField();
+        // Adjust font and color.
+        editInputs[2].setFont(HealthDiary.LB_FONT);
+        editInputs[2].setForeground(HealthDiary.VALUE_FG_COLOR);
+        editInputs[2].setHorizontalAlignment(JLabel.LEFT);
+        editInputs[2].setPreferredSize(new Dimension(300, 30));
+        editInputs[2].setBorder(BorderFactory.createCompoundBorder(
+            BorderFactory.createLineBorder(HealthDiary.VALUE_FG_COLOR, 2),
+            BorderFactory.createEmptyBorder(2, 5, 2, 5)
+        ));
+        // Add to content.
+        gridBagC = new GridBagConstraints();
+        gridBagC.insets = new InsetsUIResource(0, 5, 1, 5);
+        gridBagC.gridwidth = GridBagConstraints.REMAINDER;
+        gridBagC.gridy = 8;
+        gridBagC.gridx = 0;
+        gridBagC.fill = GridBagConstraints.HORIZONTAL;
+        editRecordContent.add(editInputs[2], gridBagC);
+
+        // ----------------------------------------------------------------------------------------------------
+        // Label for height error.
+        editMsgs[2] = new JLabel();
+        // Adjust font and color.
+        editMsgs[2].setFont(HealthDiary.LB_FONT);
+        editMsgs[2].setForeground(HealthDiary.NEGATIVE_COLOR);
+        editMsgs[2].setBackground(HealthDiary.VALUE_BG_COLOR);
+        editMsgs[2].setOpaque(true);
+        editMsgs[2].setHorizontalAlignment(JLabel.CENTER);
+        editMsgs[2].setMinimumSize(new Dimension(250, 30));
+        editMsgs[2].setBorder(BorderFactory.createEmptyBorder(0, 5, 0, 5));
+        // Add to content.
+        gridBagC = new GridBagConstraints();
+        gridBagC.insets = new InsetsUIResource(1, 5, 5, 5);
+        gridBagC.gridwidth = GridBagConstraints.REMAINDER;
+        gridBagC.gridy = 9;
+        gridBagC.gridx = 0;
+        gridBagC.fill = GridBagConstraints.HORIZONTAL;
+        editRecordContent.add(editMsgs[2], gridBagC);
+        // Set input verifier.
+        editInputs[2].setInputVerifier(new InputVerifier() {
+            @Override
+            public boolean verify(JComponent input) {
+                ((JTextField) input).setText(((JTextField) input).getText().strip());
+                // Valid height.
+                if (validateHeight(((JTextField) input).getText())) {
+                    editMsgs[2].setText("");
+                    input.setBorder(BorderFactory.createCompoundBorder(
+                        BorderFactory.createLineBorder(HealthDiary.VALUE_FG_COLOR, 2),
+                        BorderFactory.createEmptyBorder(0, 5, 0, 5)
+                    ));
+                    return true;
+                }
+                // Invalid height.
+                else {
+                    editMsgs[2].setText("* Valid height: 50.0 < x < 250.0 *");
+                    input.setBorder(BorderFactory.createCompoundBorder(
+                        BorderFactory.createLineBorder(HealthDiary.NEGATIVE_COLOR, 2),
+                        BorderFactory.createEmptyBorder(0, 5, 0, 5)
+                    ));
+                    return false;
+                }
+            }
+        });
+
+        // ----------------------------------------------------------------------------------------------------
+        // Label for weight.
+        JLabel weightLb = new JLabel("Weight (in kg):");
+        // Adjust font and color.
+        weightLb.setFont(HealthDiary.BTN_FONT);
+        weightLb.setForeground(HealthDiary.TEXT_COLOR);
+        weightLb.setHorizontalAlignment(JLabel.LEFT);
+        weightLb.setMinimumSize(new Dimension(200, 30));
+        weightLb.setBorder(BorderFactory.createEmptyBorder(0, 5, 0, 5));
+        // Add to content.
+        gridBagC = new GridBagConstraints();
+        gridBagC.insets = new InsetsUIResource(5, 5, 2, 5);
+        gridBagC.gridwidth = GridBagConstraints.REMAINDER;
+        gridBagC.gridy = 10;
+        gridBagC.gridx = 0;
+        gridBagC.fill = GridBagConstraints.HORIZONTAL;
+        editRecordContent.add(weightLb, gridBagC);
+
+        // ----------------------------------------------------------------------------------------------------
+        // Weight input.
+        editInputs[3] = new JTextField();
+        // Adjust font and color.
+        editInputs[3].setFont(HealthDiary.LB_FONT);
+        editInputs[3].setForeground(HealthDiary.VALUE_FG_COLOR);
+        editInputs[3].setHorizontalAlignment(JLabel.LEFT);
+        editInputs[3].setPreferredSize(new Dimension(300, 30));
+        editInputs[3].setBorder(BorderFactory.createCompoundBorder(
+            BorderFactory.createLineBorder(HealthDiary.VALUE_FG_COLOR, 2),
+            BorderFactory.createEmptyBorder(2, 5, 2, 5)
+        ));
+        // Add to content.
+        gridBagC = new GridBagConstraints();
+        gridBagC.insets = new InsetsUIResource(0, 5, 1, 5);
+        gridBagC.gridwidth = GridBagConstraints.REMAINDER;
+        gridBagC.gridy = 11;
+        gridBagC.gridx = 0;
+        gridBagC.fill = GridBagConstraints.HORIZONTAL;
+        editRecordContent.add(editInputs[3], gridBagC);
+
+        // ----------------------------------------------------------------------------------------------------
+        // Label for weight error.
+        editMsgs[3] = new JLabel();
+        // Adjust font and color.
+        editMsgs[3].setFont(HealthDiary.LB_FONT);
+        editMsgs[3].setForeground(HealthDiary.NEGATIVE_COLOR);
+        editMsgs[3].setBackground(HealthDiary.VALUE_BG_COLOR);
+        editMsgs[3].setOpaque(true);
+        editMsgs[3].setHorizontalAlignment(JLabel.CENTER);
+        editMsgs[3].setMinimumSize(new Dimension(250, 30));
+        editMsgs[3].setBorder(BorderFactory.createEmptyBorder(0, 5, 0, 5));
+        // Add to content.
+        gridBagC = new GridBagConstraints();
+        gridBagC.insets = new InsetsUIResource(1, 5, 5, 5);
+        gridBagC.gridwidth = GridBagConstraints.REMAINDER;
+        gridBagC.gridy = 12;
+        gridBagC.gridx = 0;
+        gridBagC.fill = GridBagConstraints.HORIZONTAL;
+        editRecordContent.add(editMsgs[3], gridBagC);
+        // Set input verifier.
+        editInputs[3].setInputVerifier(new InputVerifier() {
+            @Override
+            public boolean verify(JComponent input) {
+                ((JTextField) input).setText(((JTextField) input).getText().strip());
+                // Valid weight.
+                if (validateWeight(((JTextField) input).getText())) {
+                    editMsgs[3].setText("");
+                    input.setBorder(BorderFactory.createCompoundBorder(
+                        BorderFactory.createLineBorder(HealthDiary.VALUE_FG_COLOR, 2),
+                        BorderFactory.createEmptyBorder(0, 5, 0, 5)
+                    ));
+                    return true;
+                }
+                // Invalid weight.
+                else {
+                    editMsgs[3].setText("* Valid weight: 5.0 < x < 500.0 *");
+                    input.setBorder(BorderFactory.createCompoundBorder(
+                        BorderFactory.createLineBorder(HealthDiary.NEGATIVE_COLOR, 2),
+                        BorderFactory.createEmptyBorder(0, 5, 0, 5)
+                    ));
+                    return false;
+                }
+            }
+        });
+
+        // ----------------------------------------------------------------------------------------------------
+        // Modified ActionListener for edit saving.
+        ActionListener saveEdit = new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (!updateRecordInList()) {
+                    return;
+                }
+                
+                writeRecordFile(false);
+                refreshEachRecordPage();
+
+                // Check index after refresh View All Record Page.
+                HealthRecord tempRecord = allRecord.get(recordIndex);
+                refreshAllRecordPage();
+                recordIndex = allRecord.indexOf(tempRecord);
+
+                editRecord.actionPerformed(e);
+                return;
+            }
+        };
+
+        // ----------------------------------------------------------------------------------------------------
+        // Button for save record editing.
+        JButton saveEditBtn = new JButton("Save Edit");
+        // Adjust font and color.
+        saveEditBtn.setFont(HealthDiary.BTN_FONT);
+        saveEditBtn.setForeground(HealthDiary.BTN_FG_COLOR);
+        saveEditBtn.setBackground(HealthDiary.POSITIVE_COLOR);
+        // Adjust action.
+        saveEditBtn.setActionCommand("View Each Record");
+        saveEditBtn.addActionListener(saveEdit);
+        saveEditBtn.setFocusable(false);
+        saveEditBtn.setBorder(BorderFactory.createCompoundBorder(
+            BorderFactory.createLineBorder(HealthDiary.BTN_FG_COLOR, 3, true),
+            BorderFactory.createEmptyBorder(10, 25, 10, 25)
+        ));
+        saveEditBtn.setMinimumSize(new Dimension(100, 50));
+
+        // ----------------------------------------------------------------------------------------------------
+        // Button for cancel record editing.
+        JButton cancelEditBtn = new JButton("Cancel Edit");
+        // Adjust font and color.
+        cancelEditBtn.setFont(HealthDiary.BTN_FONT);
+        cancelEditBtn.setForeground(HealthDiary.BTN_FG_COLOR);
+        cancelEditBtn.setBackground(HealthDiary.NEGATIVE_COLOR);
+        // Adjust action.
+        cancelEditBtn.setActionCommand("View Each Record");
+        cancelEditBtn.addActionListener(editRecord);
+        cancelEditBtn.setFocusable(false);
+        cancelEditBtn.setBorder(BorderFactory.createCompoundBorder(
+            BorderFactory.createLineBorder(HealthDiary.BTN_FG_COLOR, 3, true),
+            BorderFactory.createEmptyBorder(10, 25, 10, 25)
+        ));
+        cancelEditBtn.setMinimumSize(new Dimension(100, 50));
+
+        // ----------------------------------------------------------------------------------------------------
+        // Panel for save and cancel buttons.
+        JPanel saveCancelPanel = new JPanel();
+        saveCancelPanel.setBackground(HealthDiary.THEME_BG_COLOR);
+        saveCancelPanel.setBorder(BorderFactory.createEmptyBorder(5, 15, 5, 15));
+        // Set layout.
+        GridLayout saveCancelLayout = new GridLayout();
+        saveCancelLayout.setHgap(15);
+        saveCancelPanel.setLayout(saveCancelLayout);
+        // Add button.
+        saveCancelPanel.add(saveEditBtn);
+        saveCancelPanel.add(cancelEditBtn);
+        // Add to content.
+        gridBagC = new GridBagConstraints();
+        gridBagC.insets = new InsetsUIResource(5, 5, 10, 5);
+        gridBagC.gridwidth = GridBagConstraints.REMAINDER;
+        gridBagC.gridy = 13;
+        gridBagC.gridx = 0;
+        gridBagC.fill = GridBagConstraints.HORIZONTAL;
+        editRecordContent.add(saveCancelPanel, gridBagC);
 
         // ----------------------------------------------------------------------------------------------------
         // Add content to Content Page.
@@ -858,22 +1772,196 @@ public class RecordPanel extends ContentPanel {
     }
 
     // Add new Health Record to list.
-    private void addListRecord() {
-        return;
+    private boolean addRecordInList() {
+        boolean acceptInput = true;
+
+        addInputs[0].setText(addInputs[0].getText().strip());
+        // Valid datetime.
+        if (validateDateTime(addInputs[0].getText())) {
+            addMsgs[0].setText("");
+            addInputs[0].setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createLineBorder(HealthDiary.VALUE_FG_COLOR, 2),
+                BorderFactory.createEmptyBorder(0, 5, 0, 5)
+            ));
+        }
+        // Invalid datetime.
+        else {
+            addMsgs[0].setText("* Follow format: dd/MM/yyyy hh:mm aa *");
+            addInputs[0].setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createLineBorder(HealthDiary.NEGATIVE_COLOR, 2),
+                BorderFactory.createEmptyBorder(0, 5, 0, 5)
+            ));
+            acceptInput = false;
+        }
+
+        addInputs[1].setText(addInputs[1].getText().strip());
+        // Valid body temperature.
+        if (validateBodyTemp(addInputs[1].getText())) {
+            addMsgs[1].setText("");
+            addInputs[1].setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createLineBorder(HealthDiary.VALUE_FG_COLOR, 2),
+                BorderFactory.createEmptyBorder(0, 5, 0, 5)
+            ));
+        }
+        // Invalid body temperature.
+        else {
+            addMsgs[1].setText("* Valid temperature: 25.0 < x < 50.0 *");
+            addInputs[1].setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createLineBorder(HealthDiary.NEGATIVE_COLOR, 2),
+                BorderFactory.createEmptyBorder(0, 5, 0, 5)
+            ));
+            acceptInput = false;
+        }
+
+        addInputs[2].setText(addInputs[2].getText().strip());
+        // Valid height.
+        if (validateHeight(addInputs[2].getText())) {
+            addMsgs[2].setText("");
+            addInputs[2].setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createLineBorder(HealthDiary.VALUE_FG_COLOR, 2),
+                BorderFactory.createEmptyBorder(0, 5, 0, 5)
+            ));
+        }
+        // Invalid height.
+        else {
+            addMsgs[2].setText("* Valid height: 50.0 < x < 250.0 *");
+            addInputs[2].setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createLineBorder(HealthDiary.NEGATIVE_COLOR, 2),
+                BorderFactory.createEmptyBorder(0, 5, 0, 5)
+            ));
+            acceptInput = false;
+        }
+
+        addInputs[3].setText(addInputs[3].getText().strip());
+        // Valid weight.
+        if (validateWeight(addInputs[3].getText())) {
+            addMsgs[3].setText("");
+            addInputs[3].setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createLineBorder(HealthDiary.VALUE_FG_COLOR, 2),
+                BorderFactory.createEmptyBorder(0, 5, 0, 5)
+            ));
+        }
+        // Invalid weight.
+        else {
+            addMsgs[3].setText("* Valid weight: 5.0 < x < 500.0 *");
+            addInputs[3].setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createLineBorder(HealthDiary.NEGATIVE_COLOR, 2),
+                BorderFactory.createEmptyBorder(0, 5, 0, 5)
+            ));
+            acceptInput = false;
+        }
+
+        // Store data.
+        if (acceptInput) {
+            HealthRecord tempRecord = new HealthRecord();
+
+            tempRecord.setDateTime(addInputs[0].getText());
+            tempRecord.setBodyTemp(Double.parseDouble(addInputs[1].getText()));
+            tempRecord.setHeight(Double.parseDouble(addInputs[2].getText()));
+            tempRecord.setWeight(Double.parseDouble(addInputs[3].getText()));
+
+            allRecord.add(tempRecord);
+        }
+        return acceptInput;
     }
 
     // Update Health Record in list.
-    private void updateListRecord() {
-        return;
+    private boolean updateRecordInList() {
+        boolean acceptInput = true;
+
+        editInputs[0].setText(editInputs[0].getText().strip());
+        // Valid datetime.
+        if (validateDateTime(editInputs[0].getText())) {
+            editMsgs[0].setText("");
+            editInputs[0].setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createLineBorder(HealthDiary.VALUE_FG_COLOR, 2),
+                BorderFactory.createEmptyBorder(0, 5, 0, 5)
+            ));
+        }
+        // Invalid datetime.
+        else {
+            editMsgs[0].setText("* Follow format: dd/MM/yyyy hh:mm aa *");
+            editInputs[0].setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createLineBorder(HealthDiary.NEGATIVE_COLOR, 2),
+                BorderFactory.createEmptyBorder(0, 5, 0, 5)
+            ));
+            acceptInput = false;
+        }
+
+        editInputs[1].setText(editInputs[1].getText().strip());
+        // Valid body temperature.
+        if (validateBodyTemp(editInputs[1].getText())) {
+            editMsgs[1].setText("");
+            editInputs[1].setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createLineBorder(HealthDiary.VALUE_FG_COLOR, 2),
+                BorderFactory.createEmptyBorder(0, 5, 0, 5)
+            ));
+        }
+        // Invalid body temperature.
+        else {
+            editMsgs[1].setText("* Valid temperature: 25.0 < x < 50.0 *");
+            editInputs[1].setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createLineBorder(HealthDiary.NEGATIVE_COLOR, 2),
+                BorderFactory.createEmptyBorder(0, 5, 0, 5)
+            ));
+            acceptInput = false;
+        }
+
+        editInputs[2].setText(editInputs[2].getText().strip());
+        // Valid height.
+        if (validateHeight(editInputs[2].getText())) {
+            editMsgs[2].setText("");
+            editInputs[2].setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createLineBorder(HealthDiary.VALUE_FG_COLOR, 2),
+                BorderFactory.createEmptyBorder(0, 5, 0, 5)
+            ));
+        }
+        // Invalid height.
+        else {
+            editMsgs[2].setText("* Valid height: 50.0 < x < 250.0 *");
+            editInputs[2].setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createLineBorder(HealthDiary.NEGATIVE_COLOR, 2),
+                BorderFactory.createEmptyBorder(0, 5, 0, 5)
+            ));
+            acceptInput = false;
+        }
+
+        editInputs[3].setText(editInputs[3].getText().strip());
+        // Valid weight.
+        if (validateWeight(editInputs[3].getText())) {
+            editMsgs[3].setText("");
+            editInputs[3].setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createLineBorder(HealthDiary.VALUE_FG_COLOR, 2),
+                BorderFactory.createEmptyBorder(0, 5, 0, 5)
+            ));
+        }
+        // Invalid weight.
+        else {
+            editMsgs[3].setText("* Valid weight: 5.0 < x < 500.0 *");
+            editInputs[3].setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createLineBorder(HealthDiary.NEGATIVE_COLOR, 2),
+                BorderFactory.createEmptyBorder(0, 5, 0, 5)
+            ));
+            acceptInput = false;
+        }
+
+        // Store data.
+        if (acceptInput) {
+            allRecord.get(recordIndex).setDateTime(editInputs[0].getText());
+            allRecord.get(recordIndex).setBodyTemp(Double.parseDouble(editInputs[1].getText()));
+            allRecord.get(recordIndex).setHeight(Double.parseDouble(editInputs[2].getText()));
+            allRecord.get(recordIndex).setWeight(Double.parseDouble(editInputs[3].getText()));
+        }
+        return acceptInput;
     }
 
     // Delete Health Record from list.
-    private void deleteListRecord() {
+    private void deleteRecordInList() {
         return;
     }
 
     // Refresh records with sorting in View All Record Page.
-    private void refreshAllRecordPage() {
+    protected void refreshAllRecordPage() {
         // Sort the record list using modified Comparator.
         Comparator<HealthRecord> recordComparator;
 
@@ -1048,26 +2136,26 @@ public class RecordPanel extends ContentPanel {
     // Refresh View Each Record Page based on the selected record.
     private void refreshEachRecordPage() {
         // Set date.
-        dateValue.setText(allRecord.get(recordIndex).getDateTimeStr());
+        recordValues[0].setText(allRecord.get(recordIndex).getDateTimeStr());
         // Set body temperature.
-        bodyTempValue.setText(
+        recordValues[1].setText(
             HealthRecord.VALUE_FORMAT.format(allRecord.get(recordIndex).getBodyTemp()) +
             " " + HealthDiary.UNI_CELSIUS
         );
         // Set height.
-        heightValue.setText(
+        recordValues[2].setText(
             HealthRecord.VALUE_FORMAT.format(allRecord.get(recordIndex).getHeight()) + " cm"
         );
         // Set weight.
-        weightValue.setText(
+        recordValues[3].setText(
             HealthRecord.VALUE_FORMAT.format(allRecord.get(recordIndex).getWeight()) + " kg"
         );
         // Set BMI.
-        bmiValue.setText(
+        recordValues[4].setText(
             HealthRecord.VALUE_FORMAT.format(allRecord.get(recordIndex).getBMI())
         );
         // Set BMI status.
-        statusValue.setText(allRecord.get(recordIndex).getStatusStr());
+        recordValues[5].setText(allRecord.get(recordIndex).getStatusStr());
         // Set health advice.
         adviceValue.setText(allRecord.get(recordIndex).getHealthAdvice());
         return;
@@ -1075,13 +2163,78 @@ public class RecordPanel extends ContentPanel {
 
     // Refresh Add Record Page for adding new Health Record.
     private void refreshAddRecordPage() {
-
+        HealthRecord tempRecord = new HealthRecord();
+        addInputs[0].setText(tempRecord.getDateTimeStr());
+        addInputs[0].setBorder(BorderFactory.createCompoundBorder(
+            BorderFactory.createLineBorder(HealthDiary.VALUE_FG_COLOR, 2),
+            BorderFactory.createEmptyBorder(0, 5, 0, 5)
+        ));
+        // Set body temperature.
+        addInputs[1].setText(
+            HealthRecord.VALUE_FORMAT.format(tempRecord.getBodyTemp())
+        );
+        addInputs[1].setBorder(BorderFactory.createCompoundBorder(
+            BorderFactory.createLineBorder(HealthDiary.VALUE_FG_COLOR, 2),
+            BorderFactory.createEmptyBorder(0, 5, 0, 5)
+        ));
+        // Set height.
+        addInputs[2].setText(
+            HealthRecord.VALUE_FORMAT.format(tempRecord.getHeight())
+        );
+        addInputs[2].setBorder(BorderFactory.createCompoundBorder(
+            BorderFactory.createLineBorder(HealthDiary.VALUE_FG_COLOR, 2),
+            BorderFactory.createEmptyBorder(0, 5, 0, 5)
+        ));
+        // Set weight.
+        addInputs[3].setText(
+            HealthRecord.VALUE_FORMAT.format(tempRecord.getWeight())
+        );
+        addInputs[3].setBorder(BorderFactory.createCompoundBorder(
+            BorderFactory.createLineBorder(HealthDiary.VALUE_FG_COLOR, 2),
+            BorderFactory.createEmptyBorder(0, 5, 0, 5)
+        ));
+        addMsgs[0].setText("");
+        addMsgs[1].setText("");
+        addMsgs[2].setText("");
+        addMsgs[3].setText("");
         return;
     }
 
     // Refresh Edit Record Page for editing selected record.
     private void refreshEditRecordPage() {
-        
+        editInputs[0].setText(allRecord.get(recordIndex).getDateTimeStr());
+        editInputs[0].setBorder(BorderFactory.createCompoundBorder(
+            BorderFactory.createLineBorder(HealthDiary.VALUE_FG_COLOR, 2),
+            BorderFactory.createEmptyBorder(0, 5, 0, 5)
+        ));
+        // Set body temperature.
+        editInputs[1].setText(
+            HealthRecord.VALUE_FORMAT.format(allRecord.get(recordIndex).getBodyTemp())
+        );
+        editInputs[1].setBorder(BorderFactory.createCompoundBorder(
+            BorderFactory.createLineBorder(HealthDiary.VALUE_FG_COLOR, 2),
+            BorderFactory.createEmptyBorder(0, 5, 0, 5)
+        ));
+        // Set height.
+        editInputs[2].setText(
+            HealthRecord.VALUE_FORMAT.format(allRecord.get(recordIndex).getHeight())
+        );
+        editInputs[2].setBorder(BorderFactory.createCompoundBorder(
+            BorderFactory.createLineBorder(HealthDiary.VALUE_FG_COLOR, 2),
+            BorderFactory.createEmptyBorder(0, 5, 0, 5)
+        ));
+        // Set weight.
+        editInputs[3].setText(
+            HealthRecord.VALUE_FORMAT.format(allRecord.get(recordIndex).getWeight())
+        );
+        editInputs[3].setBorder(BorderFactory.createCompoundBorder(
+            BorderFactory.createLineBorder(HealthDiary.VALUE_FG_COLOR, 2),
+            BorderFactory.createEmptyBorder(0, 5, 0, 5)
+        ));
+        editMsgs[0].setText("");
+        editMsgs[1].setText("");
+        editMsgs[2].setText("");
+        editMsgs[3].setText("");
         return;
     }
 

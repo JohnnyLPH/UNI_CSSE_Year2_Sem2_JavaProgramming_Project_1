@@ -54,4 +54,6 @@ public class GraphPanel extends ContentPanel {
         addPage(monthlyReport);
         return;
     }
+
+    // Refresh graph.
 }

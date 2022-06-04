@@ -7,14 +7,19 @@
 // Health Diary App: Home Panel.
 // Contain Home Menu, Profile Panel, Record Panel, Graph Panel.
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
 import javax.swing.*;
 
 
 public class HomePanel extends ContentPanel {
     // Content Page.
     private ContentPage homeMenu;
-    // Content Panel.
-    private ContentPanel profilePanel, recordPanel, graphPanel;
+    // Different Content Panel.
+    private ProfilePanel profilePanel;
+    private RecordPanel recordPanel;
+    private GraphPanel graphPanel;
 
     // Constructor.
     public HomePanel() {
@@ -89,7 +94,14 @@ public class HomePanel extends ContentPanel {
         toRecordBtn.setBorder(BorderFactory.createLineBorder(HealthDiary.BTN_FG_COLOR, 4, true));
         // Adjust button action.
         toRecordBtn.setActionCommand("Record Panel");
-        toRecordBtn.addActionListener(homeMenu);
+        toRecordBtn.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                homeMenu.actionPerformed(e);
+                recordPanel.refreshAllRecordPage();
+                return;
+            }
+        });
         toRecordBtn.setFocusable(false);
         toRecordBtn.setMaximumSize(new Dimension(200, 50));
         toRecordBtn.setAlignmentX(Component.CENTER_ALIGNMENT);

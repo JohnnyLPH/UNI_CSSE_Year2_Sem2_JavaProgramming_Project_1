@@ -623,7 +623,7 @@ public class ProfilePanel extends ContentPanel {
         editProfileContent.add(historyInput, gridBagC);
 
         // ----------------------------------------------------------------------------------------------------
-        // Modified ActionListener for edit cancellation.
+        // Modified ActionListener for edit saving.
         ActionListener saveEdit = new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
