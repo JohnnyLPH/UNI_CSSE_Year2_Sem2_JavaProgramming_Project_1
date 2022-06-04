@@ -29,6 +29,7 @@ public class HealthDiary {
     public static final ImageIcon EDIT_PROFILE_ICON = new ImageIcon("./img/EditProfile_Icon.png");
     public static final ImageIcon ALL_RECORD_ICON = new ImageIcon("./img/RecordList_Icon.png");
     public static final ImageIcon EACH_RECORD_ICON = new ImageIcon("./img/ViewRecord_Icon.png");
+    public static final ImageIcon EDIT_RECORD_ICON = new ImageIcon("./img/EditRecord_Icon.png");
     // Data File.
     public static final File PROFILE_FILE = new File("./data/UserProfile_Data.txt");
     public static final File RECORD_FILE = new File("./data/HealthRecord_Data.txt");

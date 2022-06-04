@@ -25,7 +25,7 @@ public class GraphPanel extends ContentPanel {
     // Method.
     // Add Monthly Report Page.
     private void addMonthlyReport() {
-        monthlyReport = new ContentPage(this);
+        monthlyReport = new ContentPage(this, "Monthly Report", 0);
         monthlyReport.setLayout(new BorderLayout());
 
         // ----------------------------------------------------------------------------------------------------
@@ -51,7 +51,7 @@ public class GraphPanel extends ContentPanel {
 
         monthlyReport.add(monthlyReportHeading, BorderLayout.CENTER);
 
-        addPage(monthlyReport, "Monthly Report", 0);
+        addPage(monthlyReport);
         return;
     }
 }

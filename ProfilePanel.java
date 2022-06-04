@@ -123,7 +123,7 @@ public class ProfilePanel extends ContentPanel {
 
     // Add View Profile Page.
     private void addViewProfile() {
-        viewProfile = new ContentPage(this);
+        viewProfile = new ContentPage(this, "View Profile", 0);
         viewProfile.setLayout(new BorderLayout());
 
         // ----------------------------------------------------------------------------------------------------
@@ -378,13 +378,13 @@ public class ProfilePanel extends ContentPanel {
         // ----------------------------------------------------------------------------------------------------
         // Add content to Content Page.
         viewProfile.add(viewProfileContent, BorderLayout.CENTER);
-        addPage(viewProfile, "View Profile", 0);
+        addPage(viewProfile);
         return;
     }
 
     // Add Edit Profile Page.
     private void addEditProfile() {
-        editProfile = new ContentPage(this);
+        editProfile = new ContentPage(this, "Edit Profile", 1);
         editProfile.setLayout(new BorderLayout());
 
         // ----------------------------------------------------------------------------------------------------
@@ -627,10 +627,10 @@ public class ProfilePanel extends ContentPanel {
         ActionListener saveEdit = new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                editProfile.actionPerformed(e);
                 updateProfile();
                 writeProfileFile();
                 refreshProfilePage(2);
+                editProfile.actionPerformed(e);
                 return;
             }
         };
@@ -695,7 +695,7 @@ public class ProfilePanel extends ContentPanel {
         // ----------------------------------------------------------------------------------------------------
         // Add content to Content Page.
         editProfile.add(editProfileContent, BorderLayout.CENTER);
-        addPage(editProfile, "Edit Profile", 1);
+        addPage(editProfile);
         return;
     }
 

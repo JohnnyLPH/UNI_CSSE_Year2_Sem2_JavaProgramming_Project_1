@@ -12,31 +12,57 @@ import javax.swing.*;
 
 public class ContentPage extends JPanel implements ActionListener {
     private ContentPanel contentPanel;
-
-    // Optional, use private class, comment out if directly implement ActionListener interface.
-    // Redirect to different pages based on buttons clicked.
-    // private class RedirectListener implements ActionListener {
-    //     @Override
-    //     public void actionPerformed(ActionEvent e) {
-    //         // Change displayed page in content panel.
-    //         ((CardLayout) contentPanel.getLayout()).show(contentPanel, e.getActionCommand());
-
-    //         // For debugging, comment out if not used.
-    //         // System.out.println("Button Click: " + e.getActionCommand());
-    //         return;
-    //     }
-    // }
+    private String pageName;
+    private int pageIndex;
 
     // Constructor.
-    public ContentPage(ContentPanel contentPanel) {
-        this.contentPanel = contentPanel;
+    public ContentPage(ContentPanel cPanel) {
+        this.contentPanel = cPanel;
+        this.pageName = "Unknown";
+        this.setName(this.pageName);
+        this.pageIndex = cPanel.getTotalPage();
         setBackground(HealthDiary.BLACK_BG_COLOR);
         return;
+    }
+
+    public ContentPage(ContentPanel cPanel, String pName, int pIndex) {
+        this.contentPanel = cPanel;
+        this.pageName = (pName.compareTo("") == 0) ? "Unknown": pName;
+        this.setName(this.pageName);
+        this.pageIndex = (pIndex > cPanel.getTotalPage() || pIndex < 0) ? cPanel.getTotalPage(): pIndex;
+        setBackground(HealthDiary.BLACK_BG_COLOR);
+        return;
+    }
+
+    // Setter.
+    public boolean setPageName(String pageName) {
+        if (pageName.compareTo("") == 0) {
+            return false;
+        }
+        this.pageName = pageName;
+        this.setName(pageName);
+        return true;
+    }
+
+    public boolean setPageIndex(int pageIndex) {
+        if (pageIndex > this.contentPanel.getTotalPage() || pageIndex < 0) {
+            return false;
+        }
+        this.pageIndex = pageIndex;
+        return true;
     }
 
     // Getter.
     public ContentPanel getContentPanel() {
         return this.contentPanel;
+    }
+
+    public String getPageName() {
+        return this.pageName;
+    }
+
+    public int getPageIndex() {
+        return this.pageIndex;
     }
 
     // Method.
@@ -46,11 +72,6 @@ public class ContentPage extends JPanel implements ActionListener {
         this.contentPanel.switchPage(this.getName());
         return;
     }
-
-    // Needed if use private class, otherwise comment out.
-    // public RedirectListener getNewRedirectListener() {
-    //     return new RedirectListener();
-    // }
 
     // Redirect to different pages based on buttons clicked.
     @Override

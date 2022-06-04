@@ -17,17 +17,20 @@ public class HealthRecord {
     public static final String[] SORT_ORDER = {"Ascend", "Descend"};
 
     // Underweight (Below 18.5), Healthy (18.5 - 24.9), Overweight (25.0 - 29.9), Obese (30.0 and above).
-    public static final String[] BMI_STATUS = {"Underweight", "Healthy", "Overweight", "Obese"};
+    public static final String[] BMI_STATUS = {
+        "Underweight (Below 18.5)", "Healthy (18.5 - 24.9)", "Overweight (25.0 - 29.9)", "Obese (30.0 and above)"
+    };
 
     // Decimal Format (for displaying 1 decimal point).
     public static final DecimalFormat VALUE_FORMAT = new DecimalFormat("0.0");
+    // Date Format (e.g., 01/06/2022 12:00 PM).
+    private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("dd/MM/yyyy hh:mm aa");;
 
     // Height in cm, Weight in kg, Temperature in Celsius.
     // BMI formula = weight in kg / (height in m ^ 2).
     private double height, weight, bodyTemp, bmi;
     // Refer: https://www.tutorialspoint.com/java/java_date_time.htm
     private Date dateTime;
-    private SimpleDateFormat dateFormat;
 
     // Constructor.
     public HealthRecord() {
@@ -36,8 +39,6 @@ public class HealthRecord {
         bodyTemp = 37;
         updateBMI();
         dateTime = new Date();
-        // Date Format (e.g., 01/06/2022 12:00 PM).
-        dateFormat = new SimpleDateFormat("dd/MM/yyyy hh:mm aa");
         return;
     }
 
@@ -72,9 +73,9 @@ public class HealthRecord {
     }
 
     public boolean setDateTime(String newTime) {
-        // Date Format (e.g., 01/06/2022 12:00 PM).
+        // Date Format (e.g., 01/06/2022 12:00 pm).
         try {
-            dateTime = dateFormat.parse(newTime);
+            dateTime = DATE_FORMAT.parse(newTime);
             return true;
         }
         catch (Exception errorMsg) {
@@ -105,7 +106,7 @@ public class HealthRecord {
     }
 
     public String getDateTimeStr() {
-        return dateFormat.format(dateTime);
+        return DATE_FORMAT.format(dateTime);
     }
 
     // Method.
@@ -148,10 +149,46 @@ public class HealthRecord {
     // Get health advice based on current BMI.
     public String getHealthAdvice() {
         int statusIndex = getStatusIndex();
-        // Underweight, need to gain weight.
-        if (statusIndex == 0) {
+        double idealWeight;
+        String adviceStr = "";
 
+        // BMI formula = weight in kg / (height in m ^ 2).
+        // Underweight (Below 18.5), need to gain weight to become Healthy.
+        if (statusIndex == 0) {
+            idealWeight = 18.5 * ((height / 100) * (height / 100));
+
+            adviceStr += "Your BMI may indicate malnutrition, an eating disorder, or other health problems.";
+            adviceStr += " Please gain at least " + VALUE_FORMAT.format(idealWeight - weight) + " kg";
+            adviceStr += " to reach the minimum healthy weight, " + VALUE_FORMAT.format(idealWeight) + " kg,";
+            adviceStr += " for your current height, " + VALUE_FORMAT.format(height) + " cm.";
         }
-        return "Testing Testing";
+        // Healthy (18.5 - 24.9), find the best weight.
+        else if (statusIndex == 1) {
+            idealWeight = ((18.5 + 24.9) / 2) * ((height / 100) * (height / 100));
+
+            adviceStr += "You are on the right track, great job!";
+            adviceStr += " Just keep it up, you are now " + VALUE_FORMAT.format(Math.abs(weight - idealWeight)) + " kg";
+            adviceStr += " away from the optimal healthy weight, " + VALUE_FORMAT.format(idealWeight) + " kg,";
+            adviceStr += " for your current height, " + VALUE_FORMAT.format(height) + " cm.";
+        }
+        // Overweight (25.0 - 29.9), need to lose weight to become Healthy.
+        else if (statusIndex == 2) {
+            idealWeight = 24.9 * ((height / 100) * (height / 100));
+
+            adviceStr += "Your BMI suggests that you should start eating a healthier diet and exercising more.";
+            adviceStr += " Please lose at least " + VALUE_FORMAT.format(weight - idealWeight) + " kg";
+            adviceStr += " to reach the maximum healthy weight, " + VALUE_FORMAT.format(idealWeight) + " kg,";
+            adviceStr += " for your current height, " + VALUE_FORMAT.format(height) + " cm.";
+        }
+        // Obese (30.0 and above), must lose weight.
+        else {
+            idealWeight = 24.9 * ((height / 100) * (height / 100));
+
+            adviceStr += "Warning, obesity is associated with a variety of diseases and conditions!";
+            adviceStr += " Aim to lose at least " + VALUE_FORMAT.format(weight - idealWeight) + " kg";
+            adviceStr += " to reach the maximum healthy weight, " + VALUE_FORMAT.format(idealWeight) + " kg,";
+            adviceStr += " for your current height, " + VALUE_FORMAT.format(height) + " cm.";
+        }
+        return adviceStr;
     }
 }

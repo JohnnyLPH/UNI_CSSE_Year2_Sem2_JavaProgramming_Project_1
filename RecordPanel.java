@@ -10,12 +10,14 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Scanner;
+import java.io.FileWriter;
 
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+
 import javax.swing.*;
 import javax.swing.plaf.InsetsUIResource;
 
@@ -35,6 +37,10 @@ public class RecordPanel extends ContentPanel {
     private int recordIndex;
     // Label for data value.
     private JLabel dateValue, bodyTempValue, heightValue, weightValue, bmiValue, statusValue;
+    // Combo Box for datetime input.
+    private JComboBox<String> editYearBox, editMonthBox, editDayBox, editHourBox, editMinBox, editMarkerBox;
+    // Text Area for advice value.
+    private JTextArea adviceValue;
 
     // Constructor.
     public RecordPanel(ContentPanel lastContentPanel) {
@@ -94,9 +100,36 @@ public class RecordPanel extends ContentPanel {
         return;
     }
 
+    // Write Health Record to file.
+    private void writeRecordFile() {
+        try {
+            // Ensure the file is created if not exist.
+            HealthDiary.RECORD_FILE.createNewFile();
+
+            FileWriter newWriter = new FileWriter(HealthDiary.RECORD_FILE);
+
+            // Write each record in single line (height, weight, body temperature, datetime).
+            for (int i = 0; i < allRecord.size(); i++) {
+                if (i > 0) {
+                    newWriter.write("\n");
+                }
+                newWriter.write(HealthRecord.VALUE_FORMAT.format(allRecord.get(i).getHeight()));
+                newWriter.write(", " + HealthRecord.VALUE_FORMAT.format(allRecord.get(i).getWeight()));
+                newWriter.write(", " + HealthRecord.VALUE_FORMAT.format(allRecord.get(i).getBodyTemp()));
+                newWriter.write(", " + allRecord.get(i).getDateTimeLong());
+            }
+
+            newWriter.close();
+        }
+        catch (Exception e) {
+            System.out.println("Error with file in writeRecordFile().");
+        }
+        return;
+    }
+
     // Add View All Record Page.
     private void addViewAllRecord() {
-        viewAllRecord = new ContentPage(this);
+        viewAllRecord = new ContentPage(this, "View All Record", 0);
         viewAllRecord.setLayout(new BorderLayout());
 
         // ----------------------------------------------------------------------------------------------------
@@ -274,13 +307,13 @@ public class RecordPanel extends ContentPanel {
         // ----------------------------------------------------------------------------------------------------
         // Add content to Content Page.
         viewAllRecord.add(viewAllRecordContent, BorderLayout.CENTER);
-        addPage(viewAllRecord, "View All Record", 0);
+        addPage(viewAllRecord);
         return;
     }
 
     // Add View Each Record Page.
     private void addViewEachRecord() {
-        viewEachRecord = new ContentPage(this);
+        viewEachRecord = new ContentPage(this, "View Each Record", 1);
         viewEachRecord.setLayout(new BorderLayout());
 
         // ----------------------------------------------------------------------------------------------------
@@ -548,7 +581,7 @@ public class RecordPanel extends ContentPanel {
 
         // ----------------------------------------------------------------------------------------------------
         // Label for status.
-        JLabel statusLb = new JLabel("Status:");
+        JLabel statusLb = new JLabel("BMI Status:");
         // Adjust font and color.
         statusLb.setFont(HealthDiary.LB_FONT);
         statusLb.setForeground(HealthDiary.TEXT_COLOR);
@@ -592,11 +625,132 @@ public class RecordPanel extends ContentPanel {
 
         // ----------------------------------------------------------------------------------------------------
         // Label for health advice.
+        JLabel adviceLb = new JLabel("LUCKY Health Advice:");
+        // Adjust font and color.
+        adviceLb.setFont(HealthDiary.LB_FONT);
+        adviceLb.setForeground(HealthDiary.TEXT_COLOR);
+        adviceLb.setBackground(HealthDiary.BLACK_BG_COLOR);
+        adviceLb.setOpaque(true);
+        adviceLb.setHorizontalAlignment(JLabel.CENTER);
+        adviceLb.setBorder(BorderFactory.createCompoundBorder(
+            BorderFactory.createLineBorder(HealthDiary.TEXT_COLOR, 2),
+            BorderFactory.createEmptyBorder(0, 5, 0, 5)
+        ));
+        // Add to content.
+        gridBagC = new GridBagConstraints();
+        gridBagC.insets = new InsetsUIResource(5, 5, 2, 5);
+        gridBagC.gridwidth = GridBagConstraints.REMAINDER;
+        gridBagC.gridy = 7;
+        gridBagC.gridx = 0;
+        gridBagC.fill = GridBagConstraints.HORIZONTAL;
+        viewEachRecordContent.add(adviceLb, gridBagC);
+
+        // ----------------------------------------------------------------------------------------------------
+        // Health advice value.
+        adviceValue = new JTextArea();
+        // Adjust font and color.
+        adviceValue.setFont(HealthDiary.LB_FONT);
+        adviceValue.setForeground(HealthDiary.VALUE_FG_COLOR);
+        adviceValue.setBackground(HealthDiary.VALUE_BG_COLOR);
+        adviceValue.setOpaque(true);
+        adviceValue.setFocusable(false);
+        adviceValue.setLineWrap(true);
+        adviceValue.setWrapStyleWord(true);
+        adviceValue.setPreferredSize(new Dimension(354, 100));
+        adviceValue.setBorder(BorderFactory.createCompoundBorder(
+            BorderFactory.createLineBorder(HealthDiary.VALUE_FG_COLOR, 2),
+            BorderFactory.createEmptyBorder(0, 5, 0, 5)
+        ));
+        // Add to content.
+        gridBagC = new GridBagConstraints();
+        gridBagC.insets = new InsetsUIResource(2, 5, 5, 5);
+        gridBagC.gridwidth = GridBagConstraints.REMAINDER;
+        gridBagC.gridy = 8;
+        gridBagC.gridx = 0;
+        gridBagC.fill = GridBagConstraints.HORIZONTAL;
+        viewEachRecordContent.add(adviceValue, gridBagC);
+
+        // ----------------------------------------------------------------------------------------------------
+        // Modified ActionListener for redirecting to Edit Record Page.
+        ActionListener toEditPage = new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                refreshEditRecordPage();
+                viewEachRecord.actionPerformed(e);
+                return;
+            }
+        };
+
+        // ----------------------------------------------------------------------------------------------------
+        // Modified ActionListener for redirecting to Delete Record Page.
+        ActionListener toDeletePage = new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                refreshDeleteRecordPage();
+                viewEachRecord.actionPerformed(e);
+                return;
+            }
+        };
+
+        // ----------------------------------------------------------------------------------------------------
+        // Button for redirecting to Edit Record Page.
+        JButton toEditPageBtn = new JButton("Edit Record");
+        // Adjust font and color.
+        toEditPageBtn.setFont(HealthDiary.BTN_FONT);
+        toEditPageBtn.setForeground(HealthDiary.BTN_FG_COLOR);
+        toEditPageBtn.setBackground(HealthDiary.POSITIVE_COLOR);
+        // Adjust action.
+        toEditPageBtn.setActionCommand("Edit Record");
+        toEditPageBtn.addActionListener(toEditPage);
+        toEditPageBtn.setFocusable(false);
+        toEditPageBtn.setBorder(BorderFactory.createCompoundBorder(
+            BorderFactory.createLineBorder(HealthDiary.BTN_FG_COLOR, 3, true),
+            BorderFactory.createEmptyBorder(10, 20, 10, 20)
+        ));
+        toEditPageBtn.setPreferredSize(new Dimension(130, 50));
+
+        // ----------------------------------------------------------------------------------------------------
+        // Button for redirecting to Delete Record Page.
+        JButton toDeletePageBtn = new JButton("Delete Record");
+        // Adjust font and color.
+        toDeletePageBtn.setFont(HealthDiary.BTN_FONT);
+        toDeletePageBtn.setForeground(HealthDiary.BTN_FG_COLOR);
+        toDeletePageBtn.setBackground(HealthDiary.NEGATIVE_COLOR);
+        // Adjust action.
+        toDeletePageBtn.setActionCommand("Delete Record");
+        toDeletePageBtn.addActionListener(toDeletePage);
+        toDeletePageBtn.setFocusable(false);
+        toDeletePageBtn.setBorder(BorderFactory.createCompoundBorder(
+            BorderFactory.createLineBorder(HealthDiary.BTN_FG_COLOR, 3, true),
+            BorderFactory.createEmptyBorder(10, 20, 10, 20)
+        ));
+        toDeletePageBtn.setPreferredSize(new Dimension(130, 50));
+
+        // ----------------------------------------------------------------------------------------------------
+        // Panel for edit and delete buttons.
+        JPanel editDeletePanel = new JPanel();
+        editDeletePanel.setBackground(HealthDiary.THEME_BG_COLOR);
+        editDeletePanel.setBorder(BorderFactory.createEmptyBorder(5, 15, 5, 15));
+        // Set layout.
+        GridLayout saveCancelLayout = new GridLayout();
+        saveCancelLayout.setHgap(15);
+        editDeletePanel.setLayout(saveCancelLayout);
+        // Add button.
+        editDeletePanel.add(toEditPageBtn);
+        editDeletePanel.add(toDeletePageBtn);
+        // Add to content.
+        gridBagC = new GridBagConstraints();
+        gridBagC.insets = new InsetsUIResource(10, 5, 10, 5);
+        gridBagC.gridwidth = GridBagConstraints.REMAINDER;
+        gridBagC.gridy = 9;
+        gridBagC.gridx = 0;
+        gridBagC.fill = GridBagConstraints.HORIZONTAL;
+        viewEachRecordContent.add(editDeletePanel, gridBagC);
 
         // ----------------------------------------------------------------------------------------------------
         // Add content to Content Page.
         viewEachRecord.add(viewEachRecordContent, BorderLayout.CENTER);
-        addPage(viewEachRecord, "View Each Record", 1);
+        addPage(viewEachRecord);
         return;
     }
 
@@ -607,6 +761,94 @@ public class RecordPanel extends ContentPanel {
 
     // Add Edit Record Page.
     private void addEditRecord() {
+        editRecord = new ContentPage(this, "Edit Record", 3);
+        editRecord.setLayout(new BorderLayout());
+
+        // ----------------------------------------------------------------------------------------------------
+        // Button for redirecting to View Each Record Page.
+        JButton toViewPageBtn = new JButton(HealthDiary.UNI_RETURN_ARROW + " Back");
+        // Adjust font and color.
+        toViewPageBtn.setFont(HealthDiary.SMALL_BTN_FONT);
+        toViewPageBtn.setForeground(HealthDiary.BTN_FG_COLOR);
+        toViewPageBtn.setBackground(HealthDiary.BTN_BG_COLOR);
+        // Adjust action.
+        toViewPageBtn.setActionCommand("View Each Record");
+        toViewPageBtn.addActionListener(editRecord);
+        toViewPageBtn.setFocusable(false);
+        // Add to Content Page.
+        editRecord.add(toViewPageBtn, BorderLayout.NORTH);
+
+        // ----------------------------------------------------------------------------------------------------
+        // For main content of Edit Record (i.e., all input fields and options).
+        JPanel editRecordContent = new JPanel(new GridBagLayout());
+        // No reuse, new object for each component.
+        GridBagConstraints gridBagC;
+        editRecordContent.setBackground(HealthDiary.THEME_BG_COLOR);
+
+        // ----------------------------------------------------------------------------------------------------
+        // Heading for Edit Record content.
+        JLabel editRecordHeading = new JLabel("Edit Record");
+        // Adjust font and color.
+        editRecordHeading.setFont(HealthDiary.MAIN_FONT);
+        editRecordHeading.setForeground(HealthDiary.TEXT_COLOR);
+        editRecordHeading.setHorizontalAlignment(JLabel.CENTER);
+        // Add icon to heading.
+        editRecordHeading.setIcon(new ImageIcon(
+            HealthDiary.EDIT_RECORD_ICON.getImage().getScaledInstance(
+                64, 64, java.awt.Image.SCALE_SMOOTH
+            )
+        ));
+        // Add to content.
+        gridBagC = new GridBagConstraints();
+        gridBagC.insets = new InsetsUIResource(10, 5, 5, 5);
+        gridBagC.gridwidth = GridBagConstraints.REMAINDER;
+        gridBagC.gridy = 0;
+        gridBagC.gridx = 0;
+        gridBagC.fill = GridBagConstraints.HORIZONTAL;
+        editRecordContent.add(editRecordHeading, gridBagC);
+
+        // ----------------------------------------------------------------------------------------------------
+        // Label for date.
+        JLabel dateLb = new JLabel("Date:");
+        // Adjust font and color.
+        dateLb.setFont(HealthDiary.BTN_FONT);
+        dateLb.setForeground(HealthDiary.TEXT_COLOR);
+        dateLb.setHorizontalAlignment(JLabel.LEFT);
+        dateLb.setPreferredSize(new Dimension(200, 30));
+        dateLb.setBorder(BorderFactory.createEmptyBorder(0, 5, 0, 5));
+        // Add to content.
+        gridBagC = new GridBagConstraints();
+        gridBagC.insets = new InsetsUIResource(5, 5, 5, 5);
+        gridBagC.gridwidth = GridBagConstraints.REMAINDER;
+        gridBagC.gridy = 4;
+        gridBagC.gridx = 0;
+        gridBagC.fill = GridBagConstraints.HORIZONTAL;
+        editRecordContent.add(dateLb, gridBagC);
+
+        // // ----------------------------------------------------------------------------------------------------
+        // // Blood type input (Combo Box).
+        // bloodComboBox = new JComboBox<String>(UserProfile.ALL_BLOOD_TYPE);
+        // // Adjust font and color.
+        // bloodComboBox.setFont(HealthDiary.BTN_FONT);
+        // bloodComboBox.setForeground(HealthDiary.VALUE_FG_COLOR);
+        // // bloodComboBox.setBackground(HealthDiary.VALUE_BG_COLOR);
+        // // Add border.
+        // bloodComboBox.setBorder(BorderFactory.createLineBorder(HealthDiary.VALUE_FG_COLOR, 2));
+        // bloodComboBox.setMinimumSize(new Dimension(100, 30));
+        // bloodComboBox.setFocusable(false);
+        // bloodComboBox.setEditable(false);
+        // // Add to content.
+        // gridBagC = new GridBagConstraints();
+        // gridBagC.insets = new InsetsUIResource(5, 5, 5, 5);
+        // gridBagC.gridy = 4;
+        // gridBagC.gridx = 1;
+        // gridBagC.fill = GridBagConstraints.HORIZONTAL;
+        // editProfileContent.add(bloodComboBox, gridBagC);
+
+        // ----------------------------------------------------------------------------------------------------
+        // Add content to Content Page.
+        editRecord.add(editRecordContent, BorderLayout.CENTER);
+        addPage(editRecord);
         return;
     }
 
@@ -805,21 +1047,29 @@ public class RecordPanel extends ContentPanel {
 
     // Refresh View Each Record Page based on the selected record.
     private void refreshEachRecordPage() {
+        // Set date.
         dateValue.setText(allRecord.get(recordIndex).getDateTimeStr());
+        // Set body temperature.
         bodyTempValue.setText(
             HealthRecord.VALUE_FORMAT.format(allRecord.get(recordIndex).getBodyTemp()) +
             " " + HealthDiary.UNI_CELSIUS
         );
+        // Set height.
         heightValue.setText(
             HealthRecord.VALUE_FORMAT.format(allRecord.get(recordIndex).getHeight()) + " cm"
         );
+        // Set weight.
         weightValue.setText(
             HealthRecord.VALUE_FORMAT.format(allRecord.get(recordIndex).getWeight()) + " kg"
         );
+        // Set BMI.
         bmiValue.setText(
             HealthRecord.VALUE_FORMAT.format(allRecord.get(recordIndex).getBMI())
         );
+        // Set BMI status.
         statusValue.setText(allRecord.get(recordIndex).getStatusStr());
+        // Set health advice.
+        adviceValue.setText(allRecord.get(recordIndex).getHealthAdvice());
         return;
     }
 
@@ -829,4 +1079,15 @@ public class RecordPanel extends ContentPanel {
         return;
     }
 
+    // Refresh Edit Record Page for editing selected record.
+    private void refreshEditRecordPage() {
+        
+        return;
+    }
+
+    // Refresh Delete Record Page for deleting selected record.
+    private void refreshDeleteRecordPage() {
+        
+        return;
+    }
 }
