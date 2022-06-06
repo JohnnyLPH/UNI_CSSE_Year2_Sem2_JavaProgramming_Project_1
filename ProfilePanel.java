@@ -7,11 +7,13 @@
 // Health Diary App: Profile Panel.
 // Contain View Profile Page, Edit Profile Page.
 import java.util.Scanner;
+
 import java.io.FileWriter;
 
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+
 import javax.swing.*;
 import javax.swing.plaf.InsetsUIResource;
 

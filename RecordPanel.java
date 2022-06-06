@@ -427,7 +427,7 @@ public class RecordPanel extends ContentPanel {
         for (int i = 0; i < 6; i++) {
             // ----------------------------------------------------------------------------------------------------
             // Label for value.
-            valueLb[i] = new JLabel("Date:");
+            valueLb[i] = new JLabel();
             // Adjust font and color.
             valueLb[i].setFont(HealthDiary.LB_FONT);
             valueLb[i].setForeground(HealthDiary.TEXT_COLOR);

@@ -7,6 +7,7 @@
 // Health Diary App: Content Page (Super Class for other pages).
 // Implement ActionListener for redirecting user to different pages in CardLayout.
 import java.awt.event.*;
+
 import javax.swing.*;
 
 
