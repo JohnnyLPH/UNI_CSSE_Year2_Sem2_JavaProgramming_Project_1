@@ -16,6 +16,7 @@ public class ContentPanel extends JPanel {
     // Upper Content Panel containing current Content Panel.
     private ContentPanel lastContentPanel;
     private ArrayList<String> allPages;
+    private String currentPage;  // Keep track displayed page in current Content Panel.
 
     // Constructor.
     public ContentPanel() {
@@ -24,6 +25,7 @@ public class ContentPanel extends JPanel {
         // This is a top Content Panel.
         this.lastContentPanel = null;
         this.allPages = new ArrayList<String>();
+        this.currentPage = "";
         return;
     }
 
@@ -33,50 +35,82 @@ public class ContentPanel extends JPanel {
         // This Content Panel is within another Content Panel.
         this.lastContentPanel = lastContentPanel;
         this.allPages = new ArrayList<String>();
-    }
-
-    // Method.
-    // Add Content Page or Content Panel.
-    public void addPage(JPanel page, String pageName) {
-        page.setName(pageName);
-        super.add(page, pageName);
-        this.allPages.add(pageName);
+        this.currentPage = "";
         return;
     }
 
-    // Add Content Page or Content Panel at specific index in allPages [0 <= x <= size].
-    public boolean addPage(JPanel page, String pageName, int pageIndex) {
+    // Method.
+    // Get total page.
+    public int getTotalPage() {
+        return allPages.size();
+    }
+
+    // Add Content Page.
+    public void addPage(ContentPage page) {
+        super.add(page, page.getPageName());
+        this.allPages.add(page.getPageIndex(), page.getPageName());
+        // First added page.
+        if (this.getTotalPage() == 1) {
+            this.currentPage = page.getPageName();
+        }
+        return;
+    }
+
+    // Add Content Page with specified name.
+    public void addPage(ContentPage page, String pageName) {
+        page.setPageName(pageName);
+        super.add(page, page.getPageName());
+        this.allPages.add(page.getPageIndex(), page.getPageName());
+        // First added page.
+        if (this.getTotalPage() == 1) {
+            this.currentPage = page.getPageName();
+        }
+        return;
+    }
+
+    // Add Content Panel with specified name.
+    public void addPage(ContentPanel page, String pageName) {
+        super.add(page, pageName);
+        this.allPages.add(pageName);
+        // First added page.
+        if (this.getTotalPage() == 1) {
+            this.currentPage = pageName;
+        }
+        return;
+    }
+
+    // Add Content Page with specified name and index.
+    public boolean addPage(ContentPage page, String pageName, int pageIndex) {
         // Invalid index.
         if (pageIndex < 0 || pageIndex > this.allPages.size()) {
             return false;
         }
 
-        page.setName(pageName);
-        super.add(page, pageName);
-        this.allPages.add(pageIndex, pageName);
+        page.setPageName(pageName);
+        page.setPageIndex(pageIndex);
+        super.add(page, page.getPageName());
+        this.allPages.add(page.getPageIndex(), page.getPageName());
+        // First added page.
+        if (this.getTotalPage() == 1) {
+            this.currentPage = page.getPageName();
+        }
         return true;
     }
 
-    // Remove Content Page or Content Panel.
-    public boolean removePage(String pageName) {
-        if (!this.allPages.contains(pageName)) {
+    // Add Content Panel with specified name and index.
+    public boolean addPage(ContentPanel page, String pageName, int pageIndex) {
+        // Invalid index.
+        if (pageIndex < 0 || pageIndex > this.allPages.size()) {
             return false;
         }
 
-        // Get objects of all pages in current Content Panel.
-        Component[] components = this.getComponents();
-
-        // Find the object of the page to remove.
-        for(int i = 0; i < components.length; i++) {
-            if (components[i].getName().equals(pageName)) {
-                components[i].setVisible(false);
-                ((CardLayout) this.getLayout()).removeLayoutComponent(components[i]);
-
-                this.allPages.remove(pageName);
-                return true;
-            }
+        super.add(page, pageName);
+        this.allPages.add(pageIndex, pageName);
+        // First added page.
+        if (this.getTotalPage() == 1) {
+            this.currentPage = pageName;
         }
-        return false;
+        return true;
     }
 
     // Switch page using page index in allPages [0 <= x < size)].
@@ -86,7 +120,11 @@ public class ContentPanel extends JPanel {
             return false;
         }
 
-        ((CardLayout) this.getLayout()).show(this, this.allPages.get(pageIndex));
+        // Not displaying the page.
+        if (this.currentPage.compareTo(this.allPages.get(pageIndex)) != 0) {
+            ((CardLayout) this.getLayout()).show(this, this.allPages.get(pageIndex));
+            this.currentPage = this.allPages.get(pageIndex);
+        }
         return true;
     }
 
@@ -96,7 +134,11 @@ public class ContentPanel extends JPanel {
             return false;
         }
 
-        ((CardLayout) this.getLayout()).show(this, pageName);
+        // Not displaying the page.
+        if (this.currentPage.compareTo(pageName) != 0) {
+            ((CardLayout) this.getLayout()).show(this, pageName);
+            this.currentPage = pageName;
+        }
         return true;
     }
 

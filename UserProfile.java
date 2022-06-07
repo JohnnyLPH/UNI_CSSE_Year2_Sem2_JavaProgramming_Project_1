@@ -9,8 +9,10 @@
 
 
 public class UserProfile {
+    // All gender and blood type.
     public static final String[] ALL_GENDER = {"Male", "Female"};
     public static final String[] ALL_BLOOD_TYPE = {"O+", "O-", "A+", "A-", "B+", "B-", "AB+", "AB-"};
+
     private String name, healthHistory;
     private int gender, bloodType;
 

@@ -19,6 +19,8 @@ import javax.swing.plaf.InsetsUIResource;
 public class ProfilePanel extends ContentPanel {
     // Content Page.
     private ContentPage viewProfile, editProfile;
+    // User Profile.
+    private UserProfile userProfile;
     // Text Field for data value and input.
     private JTextField nameValue, nameInput;
     // Label for data value.
@@ -29,16 +31,16 @@ public class ProfilePanel extends ContentPanel {
     private JRadioButton maleRadioBtn, femaleRadioBtn;
     // Combo Box for input.
     private JComboBox<String> bloodComboBox;
-    // User Profile.
-    private UserProfile userProfile;
 
     // Constructor.
     public ProfilePanel(ContentPanel lastContentPanel) {
         super(lastContentPanel);
 
         readProfileFile();
+
         addViewProfile();
         addEditProfile();
+        
         refreshProfilePage(2);
         return;
     }
@@ -121,7 +123,7 @@ public class ProfilePanel extends ContentPanel {
 
     // Add View Profile Page.
     private void addViewProfile() {
-        viewProfile = new ContentPage(this);
+        viewProfile = new ContentPage(this, "View Profile", 0);
         viewProfile.setLayout(new BorderLayout());
 
         // ----------------------------------------------------------------------------------------------------
@@ -376,13 +378,13 @@ public class ProfilePanel extends ContentPanel {
         // ----------------------------------------------------------------------------------------------------
         // Add content to Content Page.
         viewProfile.add(viewProfileContent, BorderLayout.CENTER);
-        addPage(viewProfile, "View Profile", 0);
+        addPage(viewProfile);
         return;
     }
 
     // Add Edit Profile Page.
     private void addEditProfile() {
-        editProfile = new ContentPage(this);
+        editProfile = new ContentPage(this, "Edit Profile", 1);
         editProfile.setLayout(new BorderLayout());
 
         // ----------------------------------------------------------------------------------------------------
@@ -573,7 +575,6 @@ public class ProfilePanel extends ContentPanel {
         gridBagC.fill = GridBagConstraints.HORIZONTAL;
         editProfileContent.add(bloodComboBox, gridBagC);
 
-
         // ----------------------------------------------------------------------------------------------------
         // Label for health history.
         JLabel historyLb = new JLabel("Health History:");
@@ -622,14 +623,14 @@ public class ProfilePanel extends ContentPanel {
         editProfileContent.add(historyInput, gridBagC);
 
         // ----------------------------------------------------------------------------------------------------
-        // Modified ActionListener for edit cancellation.
+        // Modified ActionListener for edit saving.
         ActionListener saveEdit = new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                editProfile.actionPerformed(e);
                 updateProfile();
                 writeProfileFile();
                 refreshProfilePage(2);
+                editProfile.actionPerformed(e);
                 return;
             }
         };
@@ -694,7 +695,7 @@ public class ProfilePanel extends ContentPanel {
         // ----------------------------------------------------------------------------------------------------
         // Add content to Content Page.
         editProfile.add(editProfileContent, BorderLayout.CENTER);
-        addPage(editProfile, "Edit Profile", 1);
+        addPage(editProfile);
         return;
     }
 
