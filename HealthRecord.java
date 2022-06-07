@@ -25,7 +25,7 @@ public class HealthRecord {
     // Decimal Format (for displaying 1 decimal point).
     public static final DecimalFormat VALUE_FORMAT = new DecimalFormat("0.0");
     // Date Format (e.g., 01/06/2022 12:00 pm).
-    public static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("dd/MM/yyyy hh:mm aa");;
+    public static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("dd/MM/yyyy hh:mm aa");
 
     // Height in cm, Weight in kg, Temperature in Celsius.
     // BMI formula = weight in kg / (height in m ^ 2).

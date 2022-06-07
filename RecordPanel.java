@@ -1382,7 +1382,7 @@ public class RecordPanel extends ContentPanel {
         // Sort in ascending order first.
         Collections.sort(allRecord, recordComparator);
         // Sort in descending order if needed by reversing the sorted list.
-        if (sortOrderBox.getSelectedIndex() == 0) {
+        if (sortOrderBox.getSelectedIndex() == 1) {
             Collections.reverse(allRecord);
         }
 

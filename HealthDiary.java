@@ -14,6 +14,8 @@ import javax.swing.*;
 
 public class HealthDiary {
     // Constants defined for later use.
+    // Window size, adapt from iPhone SE display resolution (750 * 1334).
+    public static final int WINDOW_WIDTH = 380, WINDOW_HEIGHT = 660;
     // Color Picker: https://duckduckgo.com/?q=color+picker&ia=answer
     public static final Color BLACK_BG_COLOR = new Color(35, 35, 35);
     public static final Color THEME_BG_COLOR = new Color(0, 146, 173);
@@ -56,7 +58,7 @@ public class HealthDiary {
         appFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         
         // Adapt from iPhone SE display resolution (750 * 1334).
-        appFrame.setPreferredSize(new Dimension(380, 660));
+        appFrame.setPreferredSize(new Dimension(WINDOW_WIDTH, WINDOW_HEIGHT));
         // Not allow resizing app frame.
         appFrame.setResizable(false);
         // Set icon.

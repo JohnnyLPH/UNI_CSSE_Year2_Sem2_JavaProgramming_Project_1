@@ -11,6 +11,8 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.Scanner;
 
+import java.text.SimpleDateFormat;
+
 import java.awt.*;
 
 import javax.swing.*;
@@ -24,6 +26,8 @@ public class GraphPanel extends ContentPanel {
     private ArrayList<HealthRecord> allRecord;
     // Label for date range value.
     private JLabel[] dateRangeValues;
+    // Panel for displaying line graph.
+    private JPanel reportGraphContent;
 
     // Constructor.
     public GraphPanel(ContentPanel lastContentPanel) {
@@ -83,6 +87,7 @@ public class GraphPanel extends ContentPanel {
                 }
             };
             Collections.sort(allRecord, recordComparator);
+            Collections.reverse(allRecord);
         }
         catch (Exception e) {
             System.out.println("Error with file in readSortRecordFile().");
@@ -148,14 +153,29 @@ public class GraphPanel extends ContentPanel {
         // Adjust font and color.
         dateRangeLb.setFont(HealthDiary.BTN_FONT);
         dateRangeLb.setForeground(HealthDiary.TEXT_COLOR);
-        dateRangeLb.setHorizontalAlignment(JLabel.LEFT);
-        dateRangeLb.setBorder(BorderFactory.createEmptyBorder(0, 5, 0, 5));
+        dateRangeLb.setHorizontalAlignment(JLabel.RIGHT);
+        dateRangeLb.setBorder(BorderFactory.createEmptyBorder(0, 4, 0, 4));
         // Add to content.
         gridBagC = new GridBagConstraints();
         gridBagC.insets = new InsetsUIResource(5, 5, 5, 5);
         gridBagC.gridy = 1;
         gridBagC.gridx = 0;
         headingContent.add(dateRangeLb, gridBagC);
+
+        // ----------------------------------------------------------------------------------------------------
+        // Date range between label.
+        JLabel rangeBetweenLb = new JLabel("to");
+        // Adjust font and color.
+        rangeBetweenLb.setFont(HealthDiary.BTN_FONT);
+        rangeBetweenLb.setForeground(HealthDiary.TEXT_COLOR);
+        rangeBetweenLb.setHorizontalAlignment(JLabel.CENTER);
+        rangeBetweenLb.setBorder(BorderFactory.createEmptyBorder(0, 1, 0, 1));
+        // Add to content.
+        gridBagC = new GridBagConstraints();
+        gridBagC.insets = new InsetsUIResource(5, 1, 5, 1);
+        gridBagC.gridy = 1;
+        gridBagC.gridx = 2;
+        headingContent.add(rangeBetweenLb, gridBagC);
 
         // ----------------------------------------------------------------------------------------------------
         // Array for labels of Date range value.
@@ -179,9 +199,17 @@ public class GraphPanel extends ContentPanel {
             gridBagC = new GridBagConstraints();
             gridBagC.insets = new InsetsUIResource(5, 5, 5, 5);
             gridBagC.gridy = 1;
-            gridBagC.gridx = i + 1;
+            gridBagC.gridx = i * 2 + 1;
             headingContent.add(dateRangeValues[i], gridBagC);
         }
+
+        // ----------------------------------------------------------------------------------------------------
+        // Panel for displaying the graph.
+        reportGraphContent = new JPanel(new BorderLayout());
+        reportGraphContent.setBackground(HealthDiary.BTN_BG_COLOR);
+        reportGraphContent.setBorder(BorderFactory.createEmptyBorder());
+        // Add to content.
+        monthlyReportContent.add(reportGraphContent, BorderLayout.CENTER);
 
         // ----------------------------------------------------------------------------------------------------
         // Add content to Content Page.
@@ -195,6 +223,75 @@ public class GraphPanel extends ContentPanel {
         // Read file and sort record again in case there is insertion, deletion or update of Health Record.
         readSortRecordFile();
         
+        // Remove all components in report graph content.
+        reportGraphContent.removeAll();
+        reportGraphContent.revalidate();
+        reportGraphContent.repaint();
+
+        HealthRecord tempRecord = new HealthRecord();
+        SimpleDateFormat tempDateFormat = new SimpleDateFormat("dd/MM/yyyy");
+
+        // Count backwards from 11 months before until current month (e.g., July 2021 - June 2022).
+        double[] bmiTotal = new double[12];
+        int[] bmiCount = new int[12];
+
+        // Date Format in Health Record (e.g., 01/06/2022 12:00 pm).
+        int endMonth = Integer.parseInt(tempRecord.getDateTimeStr().substring(3, 5));
+        int endYear = Integer.parseInt(tempRecord.getDateTimeStr().substring(6, 10));
+        int startMonth = endMonth - 11, startYear = endYear;
+        // Back to last year.
+        if (startMonth < 1) {
+            startMonth = 12 + startMonth;
+            startYear--;
+        }
+
+        // Set date range text.
+        dateRangeValues[0].setText(Graph.ALL_MONTHS[startMonth - 1] + " " + startYear);
+        dateRangeValues[1].setText(Graph.ALL_MONTHS[endMonth - 1] + " " + endYear);
+
+        for (int i = 0; i < 12; i++) {
+            bmiTotal[i] = bmiCount[i] = 0;
+        }
+
+        for (int i = 0; i < allRecord.size(); i++) {
+            for (int j = 0; j < 12; j++) {
+                int checkMonth = endMonth - j, checkYear = endYear;
+                // Back to last year.
+                if (checkMonth < 1) {
+                    checkMonth = 12 + checkMonth;
+                    checkYear--;
+                }
+
+                String firstMonthDay = "01/";
+                firstMonthDay += ((checkMonth < 10) ? "0" + checkMonth: checkMonth) + "/" + checkYear;
+
+                try {
+                    // Within the month.
+                    if (allRecord.get(i).getDateTimeLong() >= tempDateFormat.parse(firstMonthDay).getTime()) {
+                        System.out.println(allRecord.get(i).getDateTimeStr() + " to " + checkMonth + "/" + checkYear);
+
+                        bmiTotal[12 - 1 - j] += allRecord.get(i).getBMI();
+                        bmiCount[12 - 1 - j]++;
+                        break;
+                    }
+                }
+                catch (Exception errorMsg) {
+                    System.out.println(errorMsg);
+                }
+            }
+        }
+
+        ArrayList<Double> tempArrayList = new ArrayList<Double>();
+        for (int i = 0; i < 12; i++) {
+            if (bmiCount[i] > 0) {
+                tempArrayList.add(bmiTotal[i] / bmiCount[i]);
+            }
+            else {
+                tempArrayList.add(-1.0);
+            }
+            System.out.println("Average BMI " + i + " = " + tempArrayList.get(i));
+        }
+        reportGraphContent.add(new Graph(tempArrayList));
         return;
     }
 

@@ -120,7 +120,14 @@ public class HomePanel extends ContentPanel {
         toGraphBtn.setBorder(BorderFactory.createLineBorder(HealthDiary.BTN_FG_COLOR, 4, true));
         // Adjust button action.
         toGraphBtn.setActionCommand("Graph Panel");
-        toGraphBtn.addActionListener(homeMenu);
+        toGraphBtn.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                homeMenu.actionPerformed(e);
+                graphPanel.refreshMonthlyReportPage();
+                return;
+            }
+        });
         toGraphBtn.setFocusable(false);
         toGraphBtn.setMaximumSize(new Dimension(200, 50));
         toGraphBtn.setAlignmentX(Component.CENTER_ALIGNMENT);
