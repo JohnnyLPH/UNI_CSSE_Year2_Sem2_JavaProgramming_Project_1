@@ -12,7 +12,7 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 
 
-public class HealthRecord {
+public class HealthRecord implements HealthRecordFeature {
     // Sorting criteria and order.
     public static final String[] SORT_CRITERIA = {"Date", "Weight", "BMI"};
     public static final String[] SORT_ORDER = {"Ascend", "Descend"};

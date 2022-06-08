@@ -11,7 +11,7 @@ import java.awt.event.*;
 import javax.swing.*;
 
 
-public class ContentPage extends JPanel implements ActionListener {
+public class ContentPage extends JPanel implements ActionListener, ContentPageFeature {
     private ContentPanel contentPanel;
     private String pageName;
     private int pageIndex;

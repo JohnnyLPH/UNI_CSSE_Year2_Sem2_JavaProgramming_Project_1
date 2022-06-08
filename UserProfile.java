@@ -8,7 +8,7 @@
 // To be used in Profile Panel.
 
 
-public class UserProfile {
+public class UserProfile implements UserProfileFeature {
     // All gender and blood type.
     public static final String[] ALL_GENDER = {"Male", "Female"};
     public static final String[] ALL_BLOOD_TYPE = {"O+", "O-", "A+", "A-", "B+", "B-", "AB+", "AB-"};
