@@ -5,7 +5,7 @@
 //     - YUKI CHUNG PEI YING (77237)
 //     - ANDREA ANG XIAO XUAN (73347)
 // Health Diary App: Graph Panel.
-// Contain Monthly Report Page (Default), Weekly Report Page, Yearly Report Page.
+// Contain Monthly Report Page.
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -21,7 +21,7 @@ import javax.swing.plaf.InsetsUIResource;
 
 public class GraphPanel extends ContentPanel {
     // Content Page.
-    private ContentPage monthlyReport, weeklyReport, yearlyReport;
+    private ContentPage monthlyReport;
     // List of Health Record.
     private ArrayList<HealthRecord> allRecord;
     // Label for date range value.
@@ -184,7 +184,7 @@ public class GraphPanel extends ContentPanel {
         for (int i = 0; i < 2; i++) {
             // ----------------------------------------------------------------------------------------------------
             // Date range value.
-            dateRangeValues[i] = new JLabel("June 2022");
+            dateRangeValues[i] = new JLabel();
             // Adjust font and color.
             dateRangeValues[i].setFont(HealthDiary.BTN_FONT);
             dateRangeValues[i].setForeground(HealthDiary.VALUE_FG_COLOR);
@@ -219,7 +219,7 @@ public class GraphPanel extends ContentPanel {
     }
 
     // Refresh graph in Monthly Report Page.
-    public void refreshMonthlyReportPage() {
+    protected void refreshMonthlyReportPage() {
         // Read file and sort record again in case there is insertion, deletion or update of Health Record.
         readSortRecordFile();
         
@@ -232,14 +232,17 @@ public class GraphPanel extends ContentPanel {
         SimpleDateFormat tempDateFormat = new SimpleDateFormat("dd/MM/yyyy");
 
         // Count backwards from 11 months before until current month (e.g., July 2021 - June 2022).
-        double[] bmiTotal = new double[12];
+        double[] bmiMonthTotal = new double[12];
         int[] bmiCount = new int[12];
+        // Total no. of record within date range and their sum.
+        double totalBMI = 0;
+        int totalCount = 0;
 
         // Date Format in Health Record (e.g., 01/06/2022 12:00 pm).
         int endMonth = Integer.parseInt(tempRecord.getDateTimeStr().substring(3, 5));
         int endYear = Integer.parseInt(tempRecord.getDateTimeStr().substring(6, 10));
         int startMonth = endMonth - 11, startYear = endYear;
-        // Back to last year.
+        // Start from last year.
         if (startMonth < 1) {
             startMonth = 12 + startMonth;
             startYear--;
@@ -250,28 +253,46 @@ public class GraphPanel extends ContentPanel {
         dateRangeValues[1].setText(Graph.ALL_MONTHS[endMonth - 1] + " " + endYear);
 
         for (int i = 0; i < 12; i++) {
-            bmiTotal[i] = bmiCount[i] = 0;
+            // Set initial value to 0.
+            bmiMonthTotal[i] = bmiCount[i] = 0;
         }
 
+        int checkMonth, checkYear;
+        String firstMonthDay;
+        long compareDateA, compareDateB;
+
+        // Store BMI value in 12 months.
+        ArrayList<Double> bmiValueList = new ArrayList<Double>();
+        // Check each record.
         for (int i = 0; i < allRecord.size(); i++) {
+            // Check to see which month does the record fit in.
             for (int j = 0; j < 12; j++) {
-                int checkMonth = endMonth - j, checkYear = endYear;
+                checkMonth = endMonth - j;
+                checkYear = endYear;
                 // Back to last year.
                 if (checkMonth < 1) {
                     checkMonth = 12 + checkMonth;
                     checkYear--;
                 }
-
-                String firstMonthDay = "01/";
+                firstMonthDay = "01/";
                 firstMonthDay += ((checkMonth < 10) ? "0" + checkMonth: checkMonth) + "/" + checkYear;
 
                 try {
+                    compareDateA = allRecord.get(i).getDateTimeLong();
+                    compareDateB = tempDateFormat.parse(firstMonthDay).getTime();
                     // Within the month.
-                    if (allRecord.get(i).getDateTimeLong() >= tempDateFormat.parse(firstMonthDay).getTime()) {
-                        System.out.println(allRecord.get(i).getDateTimeStr() + " to " + checkMonth + "/" + checkYear);
-
-                        bmiTotal[12 - 1 - j] += allRecord.get(i).getBMI();
+                    if (compareDateA >= compareDateB) {
+                        // Add to each month count.
+                        bmiMonthTotal[12 - 1 - j] += allRecord.get(i).getBMI();
                         bmiCount[12 - 1 - j]++;
+
+                        // Add to list.
+                        bmiValueList.add(0, allRecord.get(i).getBMI());
+
+                        // Add to total count.
+                        totalBMI += allRecord.get(i).getBMI();
+                        totalCount++;
+                        // System.out.println(allRecord.get(i).getDateTimeStr() + "->" + checkMonth + "/" + checkYear);
                         break;
                     }
                 }
@@ -281,18 +302,50 @@ public class GraphPanel extends ContentPanel {
             }
         }
 
-        ArrayList<Double> tempArrayList = new ArrayList<Double>();
-        for (int i = 0; i < 12; i++) {
-            if (bmiCount[i] > 0) {
-                tempArrayList.add(bmiTotal[i] / bmiCount[i]);
+        if (totalCount > 0) {
+            // ----------------------------------------------------------------------------------------------------
+            // Graph generation with BMI data.
+            ArrayList<Double> tempArrayList = new ArrayList<Double>();
+            for (int i = 0; i < 12; i++) {
+                if (bmiCount[i] > 0) {
+                    tempArrayList.add(bmiMonthTotal[i] / bmiCount[i]);
+                }
+                else {
+                    tempArrayList.add(-1.0);
+                }
+                // System.out.println("Average BMI " + i + " = " + tempArrayList.get(i));
             }
-            else {
-                tempArrayList.add(-1.0);
-            }
-            System.out.println("Average BMI " + i + " = " + tempArrayList.get(i));
+            // Add to content.
+            reportGraphContent.add(new Graph(tempArrayList, startMonth), BorderLayout.CENTER);
+
+            // ----------------------------------------------------------------------------------------------------
+            // Label for BMI Average.
+            JLabel bmiAverageLb = new JLabel();
+            String bmiAverageText = "Average BMI: " + HealthRecord.VALUE_FORMAT.format(totalBMI / totalCount);
+            bmiAverageText += ", " + HealthRecord.BMI_STATUS[HealthRecord.getStatusIndex(totalBMI / totalCount)];
+            bmiAverageLb.setText(bmiAverageText);
+            // Adjust font and color.
+            bmiAverageLb.setFont(HealthDiary.BTN_FONT);
+            bmiAverageLb.setForeground(HealthDiary.TEXT_COLOR);
+            bmiAverageLb.setHorizontalAlignment(JLabel.CENTER);
+            // Adjust border.
+            bmiAverageLb.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+            // Add to content.
+            reportGraphContent.add(bmiAverageLb, BorderLayout.SOUTH);
         }
-        reportGraphContent.add(new Graph(tempArrayList));
+        else {
+            // ----------------------------------------------------------------------------------------------------
+            // Label for message.
+            JLabel noRecordMsg = new JLabel("No Record from " + Graph.ALL_MONTHS[startMonth - 1] + " " + startYear + " to " + Graph.ALL_MONTHS[endMonth - 1] + " " + endYear + " :(");
+            // Adjust font and color.
+            noRecordMsg.setFont(HealthDiary.BTN_FONT);
+            noRecordMsg.setForeground(HealthDiary.TEXT_COLOR);
+            noRecordMsg.setHorizontalAlignment(JLabel.CENTER);
+            // Adjust border.
+            noRecordMsg.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+            // Add to content.
+            reportGraphContent.add(noRecordMsg, BorderLayout.CENTER);
+        }
         return;
     }
-
 }

@@ -44,6 +44,7 @@ public class HealthDiary {
     public static final Font BTN_FONT = new Font("Comic Sans", Font.BOLD, 15);
     public static final Font SMALL_BTN_FONT = new Font("Comic Sans", Font.BOLD, 13);
     public static final Font LB_FONT = SMALL_BTN_FONT;
+    public static final Font GRAPH_LB_FONT = new Font("Comic Sans", Font.BOLD, 10);
     // Unicode special character.
     public static final char UNI_CROSS = '\u26E8';  // https://unicode-table.com/en/26E8/
     public static final char UNI_RETURN_ARROW = '\u21A9';  // https://unicode-table.com/en/21A9/

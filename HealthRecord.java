@@ -141,6 +141,21 @@ public class HealthRecord {
         return 3;
     }
 
+    // Get status index of input BMI.
+    public static int getStatusIndex(double checkBMI) {
+        // Underweight (Below 18.5), Healthy (18.5 - 24.9), Overweight (25.0 - 29.9), Obese (30.0 and above).
+        if (checkBMI < 18.50) {
+            return 0;
+        }
+        else if (checkBMI < 25.00) {
+            return 1;
+        }
+        else if (checkBMI < 30.00) {
+            return 2;
+        }
+        return 3;
+    }
+
     // Get status string of current BMI.
     public String getStatusStr() {
         // Underweight (Below 18.5), Healthy (18.5 - 24.9), Overweight (25.0 - 29.9), Obese (30.0 and above).

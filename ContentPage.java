@@ -87,7 +87,7 @@ public class ContentPage extends JPanel implements ActionListener {
         }
 
         // For debugging, comment out if not used.
-        System.out.println("Button Click: " + e.getActionCommand());
+        // System.out.println("Button Click: " + e.getActionCommand());
         return;
     }
 }
