@@ -8,10 +8,11 @@
 // To be used in Record Panel and Graph Panel.
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
+
 import java.util.*;
 
 
-public class HealthRecord {
+public class HealthRecord implements HealthRecordFeature {
     // Sorting criteria and order.
     public static final String[] SORT_CRITERIA = {"Date", "Weight", "BMI"};
     public static final String[] SORT_ORDER = {"Ascend", "Descend"};
@@ -24,7 +25,7 @@ public class HealthRecord {
     // Decimal Format (for displaying 1 decimal point).
     public static final DecimalFormat VALUE_FORMAT = new DecimalFormat("0.0");
     // Date Format (e.g., 01/06/2022 12:00 pm).
-    public static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("dd/MM/yyyy hh:mm aa");;
+    public static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("dd/MM/yyyy hh:mm aa");
 
     // Height in cm, Weight in kg, Temperature in Celsius.
     // BMI formula = weight in kg / (height in m ^ 2).
@@ -135,6 +136,21 @@ public class HealthRecord {
             return 1;
         }
         else if (bmi < 30.00) {
+            return 2;
+        }
+        return 3;
+    }
+
+    // Get status index of input BMI.
+    public static int getStatusIndex(double checkBMI) {
+        // Underweight (Below 18.5), Healthy (18.5 - 24.9), Overweight (25.0 - 29.9), Obese (30.0 and above).
+        if (checkBMI < 18.50) {
+            return 0;
+        }
+        else if (checkBMI < 25.00) {
+            return 1;
+        }
+        else if (checkBMI < 30.00) {
             return 2;
         }
         return 3;

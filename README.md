@@ -10,6 +10,9 @@ Resources:
         Switch Panels in a JFrame
             https://stackoverflow.com/questions/11648208/switch-panels-in-a-jframe
 
+        Drawing a simple line graph in Java
+            https://stackoverflow.com/questions/8693342/drawing-a-simple-line-graph-in-java
+
 Tools:
 
     Preferred Text Editor:

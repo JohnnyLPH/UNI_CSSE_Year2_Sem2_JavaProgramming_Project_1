@@ -8,11 +8,14 @@
 import java.io.File;
 
 import java.awt.*;
+
 import javax.swing.*;
 
 
 public class HealthDiary {
     // Constants defined for later use.
+    // Window size, adapt from iPhone SE display resolution (750 * 1334).
+    public static final int WINDOW_WIDTH = 380, WINDOW_HEIGHT = 660;
     // Color Picker: https://duckduckgo.com/?q=color+picker&ia=answer
     public static final Color BLACK_BG_COLOR = new Color(35, 35, 35);
     public static final Color THEME_BG_COLOR = new Color(0, 146, 173);
@@ -32,6 +35,7 @@ public class HealthDiary {
     public static final ImageIcon ADD_RECORD_ICON = new ImageIcon("./img/AddRecord_Icon.png");
     public static final ImageIcon EDIT_RECORD_ICON = new ImageIcon("./img/EditRecord_Icon.png");
     public static final ImageIcon DELETE_RECORD_ICON = new ImageIcon("./img/DeleteRecord_Icon.png");
+    public static final ImageIcon GRAPH_ICON = new ImageIcon("./img/Graph_Icon.png");
     // Data File.
     public static final File PROFILE_FILE = new File("./data/UserProfile_Data.txt");
     public static final File RECORD_FILE = new File("./data/HealthRecord_Data.txt");
@@ -40,6 +44,7 @@ public class HealthDiary {
     public static final Font BTN_FONT = new Font("Comic Sans", Font.BOLD, 15);
     public static final Font SMALL_BTN_FONT = new Font("Comic Sans", Font.BOLD, 13);
     public static final Font LB_FONT = SMALL_BTN_FONT;
+    public static final Font GRAPH_LB_FONT = new Font("Comic Sans", Font.BOLD, 10);
     // Unicode special character.
     public static final char UNI_CROSS = '\u26E8';  // https://unicode-table.com/en/26E8/
     public static final char UNI_RETURN_ARROW = '\u21A9';  // https://unicode-table.com/en/21A9/
@@ -54,7 +59,7 @@ public class HealthDiary {
         appFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         
         // Adapt from iPhone SE display resolution (750 * 1334).
-        appFrame.setPreferredSize(new Dimension(380, 660));
+        appFrame.setPreferredSize(new Dimension(WINDOW_WIDTH, WINDOW_HEIGHT));
         // Not allow resizing app frame.
         appFrame.setResizable(false);
         // Set icon.

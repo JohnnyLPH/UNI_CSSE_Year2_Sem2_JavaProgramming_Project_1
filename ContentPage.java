@@ -7,10 +7,11 @@
 // Health Diary App: Content Page (Super Class for other pages).
 // Implement ActionListener for redirecting user to different pages in CardLayout.
 import java.awt.event.*;
+
 import javax.swing.*;
 
 
-public class ContentPage extends JPanel implements ActionListener {
+public class ContentPage extends JPanel implements ActionListener, ContentPageFeature {
     private ContentPanel contentPanel;
     private String pageName;
     private int pageIndex;
@@ -86,7 +87,7 @@ public class ContentPage extends JPanel implements ActionListener {
         }
 
         // For debugging, comment out if not used.
-        System.out.println("Button Click: " + e.getActionCommand());
+        // System.out.println("Button Click: " + e.getActionCommand());
         return;
     }
 }

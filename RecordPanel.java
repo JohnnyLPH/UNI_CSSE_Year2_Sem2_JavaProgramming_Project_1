@@ -427,7 +427,7 @@ public class RecordPanel extends ContentPanel {
         for (int i = 0; i < 6; i++) {
             // ----------------------------------------------------------------------------------------------------
             // Label for value.
-            valueLb[i] = new JLabel("Date:");
+            valueLb[i] = new JLabel();
             // Adjust font and color.
             valueLb[i].setFont(HealthDiary.LB_FONT);
             valueLb[i].setForeground(HealthDiary.TEXT_COLOR);
@@ -1382,7 +1382,7 @@ public class RecordPanel extends ContentPanel {
         // Sort in ascending order first.
         Collections.sort(allRecord, recordComparator);
         // Sort in descending order if needed by reversing the sorted list.
-        if (sortOrderBox.getSelectedIndex() == 0) {
+        if (sortOrderBox.getSelectedIndex() == 1) {
             Collections.reverse(allRecord);
         }
 
